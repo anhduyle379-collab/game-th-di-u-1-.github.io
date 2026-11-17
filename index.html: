@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -1531,18 +1532,3 @@ addEventListener("resize",()=>{
 
 </body>
 </html>
-package.json:
-
-{
-  "name": "kite-world-server",
-  "version": "1.0.0",
-  "description": "Kite World Multiplayer Server",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
-  },
-  "dependencies": {
-    "express": "^4.21.2",
-    "socket.io": "^4.8.1"
-  }
-}
