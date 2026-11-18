@@ -1,73 +1,185 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Kite Flying Simulator 3D</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>KITE WORLD ULTRA 3D</title>
+
 <style>
 *{box-sizing:border-box}
-body{margin:0;overflow:hidden;background:#83c9ed;color:white;font-family:Arial}
+body{
+ margin:0;overflow:hidden;
+ font-family:Arial,sans-serif;
+ color:white;background:#70b9e8;
+}
 canvas{display:block}
-button{border:0;border-radius:12px;padding:12px 15px;background:#167fd0;color:white;font-weight:bold;cursor:pointer;box-shadow:0 3px 10px #0003;touch-action:none}
-button:active{transform:scale(.94)}
-#hud{position:fixed;top:10px;left:10px;display:flex;flex-wrap:wrap;gap:6px;z-index:5;max-width:75%}
-.panel{background:#102b40dd;border:1px solid #ffffff33;border-radius:10px;padding:8px 11px;font-size:12px;backdrop-filter:blur(8px)}
-#right{position:fixed;right:10px;top:10px;display:grid;gap:6px;z-index:5}
-#right button{font-size:12px;min-width:112px}
-#stats{position:fixed;left:10px;top:105px;background:#102b40cc;padding:9px 12px;border-radius:10px;z-index:4;font-size:11px;line-height:1.8}
-#message{position:fixed;bottom:105px;left:50%;transform:translateX(-50%);background:#102b40dd;padding:10px 16px;border-radius:12px;z-index:5;font-size:13px;text-align:center;max-width:85%}
-#move{position:fixed;bottom:14px;left:12px;display:grid;grid-template-columns:48px 48px 48px;grid-template-rows:48px 48px;gap:3px;z-index:6}
-#move button{padding:0;background:#173e5dcc;font-size:20px}
-#moveUp{grid-column:2;grid-row:1}
+button{
+ border:2px solid #ffffff35;
+ border-radius:9px;
+ padding:11px 15px;
+ color:white;
+ background:linear-gradient(#278fe0,#0755a8);
+ font-weight:900;
+ cursor:pointer;
+ box-shadow:0 4px 0 #073c70,0 5px 15px #0005;
+}
+button:active{transform:translateY(3px)}
+#hud{
+ position:fixed;top:12px;left:12px;
+ display:flex;flex-wrap:wrap;gap:7px;
+ z-index:5;max-width:75%;
+}
+.stat{
+ background:#102d43dd;
+ border:1px solid #ffffff40;
+ border-radius:10px;
+ padding:9px 12px;
+ font-size:12px;
+ backdrop-filter:blur(12px);
+}
+#right{
+ position:fixed;right:12px;top:12px;
+ display:grid;gap:9px;z-index:5;
+}
+#right button{min-width:125px}
+#stats{
+ position:fixed;top:105px;left:12px;
+ padding:12px;background:#102d43dd;
+ border-radius:12px;font-size:12px;
+ line-height:2;z-index:4;
+}
+#message{
+ position:fixed;bottom:115px;left:50%;
+ transform:translateX(-50%);
+ background:#102d43dd;
+ border-radius:12px;padding:12px 18px;
+ text-align:center;z-index:5;
+ max-width:90%;font-size:13px;
+}
+#move{
+ position:fixed;bottom:15px;left:12px;
+ display:grid;
+ grid-template-columns:48px 48px 48px;
+ grid-template-rows:48px 48px;
+ gap:4px;z-index:6;
+}
+#move button{padding:0;background:#174b70dd;font-size:20px}
+#moveUp{grid-column:2}
 #moveLeft{grid-column:1;grid-row:2}
 #moveDown{grid-column:2;grid-row:2}
 #moveRight{grid-column:3;grid-row:2}
-#flightControls{position:fixed;bottom:17px;right:12px;display:flex;gap:7px;z-index:6}
-#flightControls button{min-width:62px}
-#kiteLeft,#kiteRight{background:#a64fc9}
-#action{background:#15a45e}
-#shop,#custom{position:fixed;inset:0;background:#061827dd;z-index:10;display:none;place-items:center}
-.modal{width:min(380px,92vw);max-height:85vh;overflow:auto;background:#173650;padding:20px;border-radius:18px}
-.modal button{display:block;width:100%;margin:7px 0}
-.item{padding:10px;margin:7px 0;background:#ffffff12;border-radius:10px}
+#flight{
+ position:fixed;bottom:17px;right:12px;
+ display:flex;gap:7px;z-index:6;
+}
+#flight button{padding:12px 9px}
+#kiteLeft,#kiteRight{background:#9b43c8}
+#action{
+ position:fixed;bottom:17px;left:50%;
+ transform:translateX(-50%);
+ z-index:7;background:linear-gradient(#24d78b,#087c4d);
+}
+#action:active{transform:translateX(-50%) translateY(3px)}
+#shop,#custom{
+ position:fixed;inset:0;
+ display:none;place-items:center;
+ background:#0009;z-index:20;
+ backdrop-filter:blur(6px);
+}
+.window{
+ width:min(590px,94vw);
+ max-height:88vh;overflow:auto;
+ background:#512b1b;
+ border:7px solid #874627;
+ border-radius:12px;
+ box-shadow:0 0 35px #0009;
+}
+.windowHeader{
+ background:linear-gradient(#64db55,#168a35);
+ padding:12px;
+ display:flex;justify-content:space-between;
+ align-items:center;
+ border-bottom:5px solid #3e2718;
+}
+.windowHeader h2{margin:0;font-size:19px}
+.windowBody{padding:12px}
+.item{
+ display:flex;align-items:center;gap:12px;
+ background:#75452d;
+ border:4px solid #3d2115;
+ margin-bottom:10px;padding:10px;
+ min-height:105px;
+}
+.itemIcon{
+ width:90px;height:85px;
+ flex-shrink:0;
+ display:grid;place-items:center;
+ background:#a46b46;
+ border:3px solid #643b25;
+ font-size:37px;
+}
+.itemInfo{flex:1;min-width:0}
+.itemInfo h3{margin:0 0 7px;font-size:19px}
+.itemInfo p{margin:4px 0;font-size:12px;color:#ddd}
+.itemInfo button{margin-top:5px}
+.rarity{
+ display:inline-block;padding:4px 8px;
+ background:#265de9;border-radius:4px;
+ font-weight:bold;font-size:12px;
+}
+.noStock{color:#ff3939;font-weight:900}
+.footer{
+ display:flex;gap:8px;padding:10px;
+ background:#432719;
+}
+.footer button{flex:1}
+#closeShop{background:#d83232}
+#restock{background:#ffbb20;color:#432000}
+#toast{
+ position:fixed;top:48%;left:50%;
+ transform:translate(-50%,-50%);
+ background:#142e42ee;padding:15px 25px;
+ border-radius:12px;z-index:50;
+ display:none;text-align:center;
+}
 @media(max-width:650px){
- .panel{font-size:10px;padding:7px}
- #right button{font-size:10px;min-width:88px;padding:9px}
- #stats{top:95px;font-size:10px;padding:7px}
- #move{transform:scale(.85);transform-origin:bottom left}
- #flightControls{right:8px;bottom:20px;gap:5px}
- #flightControls button{font-size:11px;padding:13px 9px;min-width:54px}
- #message{bottom:125px;font-size:11px}
+ .stat{font-size:10px;padding:7px}
+ #right button{min-width:95px;font-size:10px;padding:9px}
+ #stats{font-size:10px;top:95px}
+ #flight button{font-size:10px;padding:12px 7px}
+ #move{transform:scale(.88);transform-origin:bottom left}
+ .itemIcon{width:65px;height:65px}
+ .itemInfo h3{font-size:15px}
 }
 </style>
 </head>
+
 <body>
 
 <div id="hud">
- <div class="panel">💰 <b id="money">0</b></div>
- <div class="panel">⬆️ <b id="altitude">0</b> m</div>
- <div class="panel">↔️ <b id="distance">0</b> m</div>
- <div class="panel">🌬️ <b id="wind">8</b> km/h</div>
- <div class="panel">🏆 <b id="record">0</b> m</div>
+ <div class="stat">💰 <b id="money">0</b></div>
+ <div class="stat">⬆️ <b id="alt">0</b> m</div>
+ <div class="stat">↔️ <b id="dist">0</b> m</div>
+ <div class="stat">🌬️ <b id="wind">8</b> km/h</div>
+ <div class="stat">🏆 <b id="record">0</b> m</div>
 </div>
 
 <div id="stats">
  <div>🧵 Dây: <b id="rope">35</b> m</div>
  <div>⚡ Căng dây: <b id="tension">0</b>%</div>
- <div>🧭 Hướng gió: <b id="direction">Tây</b></div>
+ <div>🪶 Carbon: <b id="carbon">Basic</b></div>
  <div>🌤️ Thời tiết: <b id="weather">Nắng đẹp</b></div>
  <div>🪁 Trạng thái: <b id="status">Đi bộ</b></div>
 </div>
 
 <div id="right">
- <button onclick="openShop()">🛒 Cửa hàng</button>
- <button onclick="openCustom()">🎨 Trang trí diều</button>
- <button onclick="changeWeather()">🌦️ Thời tiết</button>
- <button onclick="changeCamera()">📷 Camera</button>
+ <button onclick="openShop()">🛒 CỬA HÀNG</button>
+ <button onclick="changeCamera()">📷 CAMERA</button>
+ <button onclick="changeWeather()">🌦️ THỜI TIẾT</button>
+ <button onclick="toggleGraphics()">✨ GRAPHICS</button>
+ <button onclick="openCustom()">🎨 TRANG TRÍ</button>
 </div>
 
-<!-- Nhân vật luôn có thể di chuyển -->
 <div id="move">
  <button id="moveUp">▲</button>
  <button id="moveLeft">◀</button>
@@ -75,150 +187,351 @@ button:active{transform:scale(.94)}
  <button id="moveRight">▶</button>
 </div>
 
-<!-- Nút điều khiển diều, chỉ hiện sau khi ném -->
-<div id="flightControls" style="display:none">
- <button id="kiteLeft">◀ Diều</button>
- <button id="reel">⬆ Kéo dây</button>
- <button id="letout">⬇ Nhả dây</button>
- <button id="kiteRight">Diều ▶</button>
+<div id="flight" style="display:none">
+ <button id="kiteLeft">◀</button>
+ <button id="reel">⬆ KÉO</button>
+ <button id="out">⬇ NHẢ</button>
+ <button id="kiteRight">▶</button>
 </div>
 
-<div id="message">Đi đến bãi cỏ rồi bấm Cầm diều!</div>
-<button id="action" onclick="mainAction()" style="position:fixed;bottom:17px;left:50%;transform:translateX(-50%);z-index:7">🪁 Cầm diều</button>
+<button id="action" onclick="mainAction()">🪁 CẦM DIỀU</button>
 
+<div id="message">Chào mừng đến KITE WORLD!</div>
+<div id="toast"></div>
+
+<!-- CARBON SHOP -->
 <div id="shop">
- <div class="modal">
-  <h2>🛒 Cửa hàng</h2>
-  <p>Tiền: <b id="shopMoney">0</b></p>
-  <div id="shopItems"></div>
-  <button onclick="closeShop()" style="background:#555">Đóng</button>
+ <div class="window">
+  <div class="windowHeader">
+   <h2>🪁 CARBON & KITE SHOP</h2>
+   <button id="closeShop" onclick="closeShop()">X</button>
+  </div>
+  <div class="windowHeader">
+   <b id="restockTimer">New stock in 4m 00s</b>
+   <button id="restock" onclick="restock(true)">RESTOCK</button>
+  </div>
+  <div class="windowBody" id="shopItems"></div>
+  <div class="footer">
+   <button>💰 <span id="shopMoney">0</span> xu</button>
+   <button onclick="dailyReward()">🎁 DAILY GIFT</button>
+  </div>
  </div>
 </div>
 
 <div id="custom">
- <div class="modal">
-  <h2>🎨 Trang trí diều</h2>
-  <div id="colors"></div>
-  <button onclick="addStars()">⭐ Thêm sao</button>
-  <button onclick="addTail()">🎀 Thêm đuôi</button>
-  <button onclick="closeCustom()" style="background:#555">Đóng</button>
+ <div class="window">
+  <div class="windowHeader">
+   <h2>🎨 KITE CUSTOMIZATION</h2>
+   <button onclick="closeCustom()">X</button>
+  </div>
+  <div class="windowBody">
+   <h3>Màu sắc diều</h3>
+   <button onclick="paintKite(0xff3434)">🔴 Đỏ</button>
+   <button onclick="paintKite(0x28aaff)">🔵 Xanh</button>
+   <button onclick="paintKite(0xffd42a)">🟡 Vàng</button>
+   <button onclick="paintKite(0xb45cff)">🟣 Tím</button>
+   <h3>Nâng cấp trang trí</h3>
+   <button onclick="addDecoration()">⭐ Thêm sao - 100 xu</button>
+  </div>
  </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/GammaCorrectionShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+
 <script>
-(() => {
+(()=>{
 "use strict";
+
 const $=id=>document.getElementById(id);
+
+// [SỬA] kiểm tra THREE TRƯỚC khi dùng THREE.MathUtils
 if(!window.THREE){
- $("message").textContent="Không tải được Three.js. Hãy kiểm tra Internet.";
+ $("message").textContent="Không tải được Three.js. Kiểm tra Internet.";
  return;
 }
 
-//==================================================
-// THẾ GIỚI 3D
-//==================================================
-const scene=new THREE.Scene();
-scene.background=new THREE.Color(0x83c9ed);
-scene.fog=new THREE.Fog(0x83c9ed,140,600);
+const clamp=THREE.MathUtils.clamp;
 
-const camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,1500);
-const renderer=new THREE.WebGLRenderer({antialias:true});
+//==================================================
+// GRAPHICS ENGINE
+//==================================================
+
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x83c9f5);
+scene.fog=new THREE.FogExp2(0x9bcdf0,.0015);
+
+const camera=new THREE.PerspectiveCamera(
+ 65,innerWidth/innerHeight,.1,1800
+);
+
+const renderer=new THREE.WebGLRenderer({
+ antialias:true,
+ powerPreference:"high-performance"
+});
+
 renderer.setSize(innerWidth,innerHeight);
-renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.25));
 renderer.shadowMap.enabled=true;
-renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.shadowMap.type=THREE.PCFShadowMap;
+renderer.outputEncoding=THREE.sRGBEncoding;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=.8;
+
 document.body.appendChild(renderer.domElement);
 
-scene.add(new THREE.HemisphereLight(0xdaf3ff,0x526c43,2));
-const sun=new THREE.DirectionalLight(0xfff0d4,2);
-sun.position.set(-50,100,50);
+let composer=null;
+let bloom=null;
+let quality=1; // 0=Tiết kiệm, 1=Cân bằng, 2=Ultra
+const QUALITY_NAMES=["TIẾT KIỆM (mượt nhất)","CÂN BẰNG","ULTRA (bloom)"];
+
+function setupPost(){
+ try{
+  if(!THREE.EffectComposer)return;
+  composer=new THREE.EffectComposer(renderer);
+  composer.addPass(new THREE.RenderPass(scene,camera));
+  bloom=new THREE.UnrealBloomPass(
+   new THREE.Vector2(innerWidth,innerHeight),
+   .18,.45,.97
+  );
+  composer.addPass(bloom);
+  // composer không tự mã hóa sRGB -> thêm gamma để không bị tối/lệch màu
+  if(THREE.GammaCorrectionShader){
+   composer.addPass(new THREE.ShaderPass(THREE.GammaCorrectionShader));
+  }
+ }catch(e){
+  composer=null;
+ }
+}
+
+setupPost();
+
+function applyQuality(){
+ const ratios=[1,1.25,1.7];
+ renderer.setPixelRatio(Math.min(devicePixelRatio,ratios[quality]));
+ renderer.setSize(innerWidth,innerHeight);
+ if(composer)composer.setSize(innerWidth,innerHeight);
+ const shadows=quality>0;
+ if(renderer.shadowMap.enabled!==shadows){
+  renderer.shadowMap.enabled=shadows;
+  scene.traverse(o=>{
+   if(o.material){
+    (Array.isArray(o.material)?o.material:[o.material])
+     .forEach(m=>m.needsUpdate=true);
+   }
+  });
+ }
+}
+
+scene.add(new THREE.HemisphereLight(0xc8edff,0x526b39,.7));
+
+const sun=new THREE.DirectionalLight(0xffefc7,1.5);
+sun.position.set(-80,130,60);
 sun.castShadow=true;
+sun.shadow.mapSize.set(1024,1024);
+sun.shadow.camera.left=-130;
+sun.shadow.camera.right=130;
+sun.shadow.camera.top=130;
+sun.shadow.camera.bottom=-130;
+sun.shadow.camera.far=400;
 scene.add(sun);
+scene.add(sun.target);
+
+const ambient=new THREE.AmbientLight(0xffffff,.12);
+scene.add(ambient);
+
+//==================================================
+// SKY AND SUN
+//==================================================
+
+const sunBall=new THREE.Mesh(
+ new THREE.SphereGeometry(8,32,24),
+ new THREE.MeshBasicMaterial({color:0xffefb0,fog:false})
+);
+sunBall.position.set(-180,145,-280);
+scene.add(sunBall);
+
+const sky=new THREE.Mesh(
+ new THREE.SphereGeometry(900,32,24),
+ new THREE.MeshBasicMaterial({
+  color:0x86cafa,side:THREE.BackSide,fog:false
+ })
+);
+scene.add(sky);
+
+//==================================================
+// GROUND
+//==================================================
 
 const ground=new THREE.Mesh(
- new THREE.PlaneGeometry(1200,1200),
- new THREE.MeshStandardMaterial({color:0x65a94e,roughness:1})
+ new THREE.PlaneGeometry(1300,1300),
+ new THREE.MeshStandardMaterial({
+  color:0x65a94c,roughness:1
+ })
 );
 ground.rotation.x=-Math.PI/2;
-ground.position.y=-.15;
+ground.position.y=-.2;
 ground.receiveShadow=true;
 scene.add(ground);
 
-function path(x,z,w,d){
+// Grass
+const grassGeo=new THREE.ConeGeometry(.12,.8,3);
+const grassMat=new THREE.MeshStandardMaterial({
+ color:0x39853c,roughness:1
+});
+const grass=new THREE.InstancedMesh(grassGeo,grassMat,3500);
+// [SỬA] InstancedMesh r128 dùng bounding của 1 cỏ -> bị culling mất khi gốc ngoài màn hình
+grass.frustumCulled=false;
+const dummy=new THREE.Object3D();
+
+for(let i=0;i<3500;i++){
+ dummy.position.set(
+  (Math.random()-.5)*300,
+  .3,
+  (Math.random()-.5)*350
+ );
+ dummy.rotation.y=Math.random()*6.28;
+ let s=.4+Math.random();
+ dummy.scale.set(s,s,s);
+ dummy.updateMatrix();
+ grass.setMatrixAt(i,dummy.matrix);
+}
+grass.instanceMatrix.needsUpdate=true;
+scene.add(grass);
+
+// Paths
+function makePath(x,z,w,d,color){
  const m=new THREE.Mesh(
   new THREE.PlaneGeometry(w,d),
-  new THREE.MeshStandardMaterial({color:0xb9a17e})
+  new THREE.MeshStandardMaterial({color,roughness:1})
  );
  m.rotation.x=-Math.PI/2;
- m.position.set(x,.01,z);
+ m.position.set(x,.02,z);
  scene.add(m);
 }
-path(0,-70,12,350);
-path(-50,-80,90,6);
+makePath(0,-70,12,400,0xb5a181);
+makePath(-45,-80,100,7,0xb5a181);
 
+// Lake
 const lake=new THREE.Mesh(
- new THREE.CircleGeometry(22,48),
- new THREE.MeshStandardMaterial({color:0x43b7d4,roughness:.25})
+ new THREE.CircleGeometry(27,64),
+ new THREE.MeshPhysicalMaterial({
+  color:0x36bce2,
+  roughness:.13,
+  metalness:.15,
+  clearcoat:1
+ })
 );
 lake.rotation.x=-Math.PI/2;
-lake.position.set(60,.02,-80);
+lake.position.set(60,.04,-80);
 scene.add(lake);
 
-// Cây
+// Mountains
+const hillMat=new THREE.MeshStandardMaterial({color:0x729e70});
+for(let i=0;i<13;i++){
+ const h=new THREE.Mesh(
+  new THREE.SphereGeometry(1,24,12),hillMat
+ );
+ h.scale.set(35+Math.random()*40,12+Math.random()*20,25);
+ h.position.set((i-6)*55,-7,-270-Math.random()*30);
+ scene.add(h);
+}
+
+//==================================================
+// TREES
+//==================================================
+
 const trees=[];
-function makeTree(x,z){
+
+function createTree(x,z){
  const g=new THREE.Group();
+
  const trunk=new THREE.Mesh(
-  new THREE.CylinderGeometry(.3,.45,4,8),
-  new THREE.MeshStandardMaterial({color:0x79512e})
+  new THREE.CylinderGeometry(.35,.5,4,10),
+  new THREE.MeshStandardMaterial({color:0x75502e})
  );
  trunk.position.y=2;
  g.add(trunk);
- const leaves=new THREE.Mesh(
-  new THREE.SphereGeometry(2.6,12,10),
-  new THREE.MeshStandardMaterial({color:0x287d3d})
- );
- leaves.position.y=4.7;
- g.add(leaves);
+
+ for(let i=0;i<3;i++){
+  const leaves=new THREE.Mesh(
+   new THREE.SphereGeometry(2.7-i*.25,10,8),
+   new THREE.MeshStandardMaterial({
+    color:[0x277b37,0x348d3d,0x236b32][i]
+   })
+  );
+  leaves.position.set(
+   (Math.random()-.5)*1.4,
+   4.5+i*1.1,
+   (Math.random()-.5)*1.2
+  );
+  leaves.scale.y=1.2;
+  g.add(leaves);
+ }
+
  g.position.set(x,0,z);
- g.traverse(o=>{if(o.isMesh)o.castShadow=true});
+ g.traverse(o=>{
+  if(o.isMesh)o.castShadow=true;
+ });
  scene.add(g);
  trees.push(g);
 }
-for(let i=0;i<100;i++){
- const x=(Math.random()-.5)*280;
- const z=-Math.random()*320;
- if(Math.abs(x)<17 && z>-180)continue;
- makeTree(x,z);
+
+for(let i=0;i<115;i++){
+ const x=(Math.random()-.5)*320;
+ const z=-Math.random()*350;
+ if(Math.abs(x)<17&&z>-180)continue;
+ createTree(x,z);
 }
 
-// Mây
+//==================================================
+// CLOUDS
+//==================================================
+
 const clouds=[];
-for(let i=0;i<25;i++){
- const g=new THREE.Group();
- const mat=new THREE.MeshStandardMaterial({color:0xffffff});
- for(let j=0;j<5;j++){
-  const m=new THREE.Mesh(new THREE.SphereGeometry(3+Math.random()*2,12,10),mat);
-  m.position.set(j*3,Math.random()*1.5,Math.random()*2);
+
+for(let i=0;i<32;i++){
+ const group=new THREE.Group();
+ const mat=new THREE.MeshStandardMaterial({
+  color:0xffffff,roughness:1
+ });
+
+ for(let j=0;j<6;j++){
+  const m=new THREE.Mesh(
+   new THREE.SphereGeometry(3+Math.random()*3,10,8),
+   mat
+  );
+  m.position.set(j*3,Math.random()*2,Math.random()*2);
   m.scale.y=.65;
-  g.add(m);
+  group.add(m);
  }
- g.position.set((Math.random()-.5)*400,35+Math.random()*60,-Math.random()*300);
- scene.add(g);
- clouds.push(g);
+
+ group.position.set(
+  (Math.random()-.5)*450,
+  38+Math.random()*75,
+  -Math.random()*400
+ );
+
+ scene.add(group);
+ clouds.push(group);
 }
 
 //==================================================
-// NHÂN VẬT
+// PLAYER
 //==================================================
-function createPerson(shirtColor,pantsColor){
+
+function createPerson(){
  const root=new THREE.Group();
- const shirt=new THREE.MeshStandardMaterial({color:shirtColor});
- const pants=new THREE.MeshStandardMaterial({color:pantsColor});
  const skin=new THREE.MeshStandardMaterial({color:0xe8b891});
- const hair=new THREE.MeshStandardMaterial({color:0x30251f});
- const eye=new THREE.MeshStandardMaterial({color:0x222222});
+ const shirt=new THREE.MeshStandardMaterial({color:0x2389e8});
+ const pants=new THREE.MeshStandardMaterial({color:0x25374d});
+ const hair=new THREE.MeshStandardMaterial({color:0x29201b});
  const limbs=[];
 
  function part(parent,geo,mat,x,y,z){
@@ -229,177 +542,403 @@ function createPerson(shirtColor,pantsColor){
   return m;
  }
 
- part(root,new THREE.CylinderGeometry(.48,.57,1.55,14),shirt,0,2.25,0);
- part(root,new THREE.CylinderGeometry(.15,.15,.25,10),skin,0,3.12,0);
- part(root,new THREE.SphereGeometry(.46,16,14),skin,0,3.55,0);
- part(root,new THREE.SphereGeometry(.47,14,10,0,Math.PI*2,0,Math.PI*.55),hair,0,3.73,0);
- part(root,new THREE.SphereGeometry(.055,8,8),eye,-.15,3.58,.4);
- part(root,new THREE.SphereGeometry(.055,8,8),eye,.15,3.58,.4);
+ part(root,new THREE.CylinderGeometry(.48,.55,1.5,12),shirt,0,2.2,0);
+ part(root,new THREE.SphereGeometry(.45,16,12),skin,0,3.35,0);
+ part(root,new THREE.SphereGeometry(.46,16,12,0,6.28,0,1.6),hair,0,3.55,0);
 
  for(const side of [-1,1]){
   const leg=new THREE.Group();
-  leg.position.set(side*.24,1.5,0);
+  leg.position.set(side*.23,1.5,0);
   root.add(leg);
-  part(leg,new THREE.CylinderGeometry(.17,.2,1.1,10),pants,0,-.45,0);
-  part(leg,new THREE.SphereGeometry(.2,8,8),pants,0,-.95,.12);
-  limbs.push({obj:leg,type:"leg",side});
+  part(leg,new THREE.CylinderGeometry(.16,.2,1.1,10),pants,0,-.45,0);
+  limbs.push({obj:leg,type:"leg"});
 
   const arm=new THREE.Group();
-  arm.position.set(side*.57,2.75,0);
+  arm.position.set(side*.55,2.7,0);
   root.add(arm);
-  part(arm,new THREE.CylinderGeometry(.13,.16,.95,10),skin,0,-.35,0);
+  part(arm,new THREE.CylinderGeometry(.12,.15,.9,10),skin,0,-.35,0);
   limbs.push({obj:arm,type:"arm",side});
  }
+
+ scene.add(root);
  return {root,limbs};
 }
 
-const player=createPerson(0x247bd2,0x26384d);
+const player=createPerson();
 player.root.position.set(0,0,8);
-scene.add(player.root);
-
-// NPC
-const npcs=[];
-const npcColors=[0xd94c4c,0xf1b73c,0x9866cf,0x37a98c,0xe6e6e6,0xdf7a38];
-for(let i=0;i<10;i++){
- const n=createPerson(npcColors[i%npcColors.length],0x35445a);
- n.root.position.set((Math.random()-.5)*80,0,-20-Math.random()*130);
- scene.add(n.root);
- npcs.push({
-  ...n,
-  cx:n.root.position.x,
-  cz:n.root.position.z,
-  angle:Math.random()*6.28,
-  speed:.5+Math.random()*.8,
-  radius:5+Math.random()*13,
-  phase:Math.random()*5
- });
-}
 
 //==================================================
-// DIỀU 3D
+// KITE MODEL
 //==================================================
+
 const kite=new THREE.Group();
-const kiteColors=[0xe74352,0x269ee9,0xffc32c,0x9b60df,0x25ad83];
-const kiteMats=kiteColors.map(c=>new THREE.MeshStandardMaterial({color:c,side:THREE.DoubleSide}));
+const colors=[0xff3434,0x258fff,0xffdc35,0xa44bff];
+
+const kiteMats=colors.map(c=>
+ new THREE.MeshStandardMaterial({
+  color:c,side:THREE.DoubleSide,
+  roughness:.35,metalness:.12
+ })
+);
+
 function triangle(a,b,c,mat){
  const geo=new THREE.BufferGeometry();
- geo.setAttribute("position",new THREE.Float32BufferAttribute([...a,...b,...c],3));
+ geo.setAttribute(
+  "position",
+  new THREE.Float32BufferAttribute([...a,...b,...c],3)
+ );
  geo.computeVertexNormals();
- const m=new THREE.Mesh(geo,mat);
- kite.add(m);
- m.castShadow=true;
- return m;
+ const mesh=new THREE.Mesh(geo,mat);
+ mesh.castShadow=true;
+ kite.add(mesh);
+ return mesh;
 }
+
 triangle([0,0,.05],[-3.8,-4.8,.05],[0,-7,.05],kiteMats[0]);
 triangle([0,0,.05],[0,-7,.05],[3.8,-4.8,.05],kiteMats[1]);
 triangle([0,0,.05],[0,4.8,.05],[-3.8,-4.8,.05],kiteMats[2]);
 triangle([0,0,.05],[3.8,-4.8,.05],[0,4.8,.05],kiteMats[3]);
 
-const stickMat=new THREE.MeshStandardMaterial({color:0xffe7aa});
-function rod(a,b){
+const carbonMat=new THREE.MeshStandardMaterial({
+ color:0x252b31,metalness:.8,roughness:.24
+});
+
+function rod(a,b,material=carbonMat,radius=.055){
  const d=new THREE.Vector3().subVectors(b,a);
- const m=new THREE.Mesh(new THREE.CylinderGeometry(.045,.045,d.length(),8),stickMat);
+ const m=new THREE.Mesh(
+  new THREE.CylinderGeometry(radius,radius,d.length(),10),
+  material
+ );
  m.position.copy(a).add(b).multiplyScalar(.5);
- m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize());
+ m.quaternion.setFromUnitVectors(
+  new THREE.Vector3(0,1,0),d.normalize()
+ );
  kite.add(m);
+ return m;
 }
+
 rod(new THREE.Vector3(0,-7,.1),new THREE.Vector3(0,4.8,.1));
 rod(new THREE.Vector3(-3.8,-4.8,.1),new THREE.Vector3(3.8,-4.8,.1));
 
 const stars=new THREE.Group();
 kite.add(stars);
-function addStars(){
- for(let i=0;i<3;i++){
-  const m=new THREE.Mesh(
-   new THREE.SphereGeometry(.3+Math.random()*.3,10,8),
-   new THREE.MeshStandardMaterial({color:[0xffffff,0xffdf37,0x4ce5ff,0xff7fb1][Math.floor(Math.random()*4)]})
-  );
-  m.position.set((Math.random()-.5)*4,Math.random()*6-2,.2);
-  stars.add(m);
- }
+
+function addDecoration(){
+ if(money<100){toast("Không đủ tiền!");return}
+ money-=100;
+
+ const star=new THREE.Mesh(
+  new THREE.SphereGeometry(.35,12,10),
+  new THREE.MeshStandardMaterial({
+   color:0xffe33b,emissive:0x553300
+  })
+ );
+ star.position.set((Math.random()-.5)*4,Math.random()*5,.3);
+ stars.add(star);
+ updateUI();
 }
-addStars();
 
 const tail=new THREE.Group();
 kite.add(tail);
-function addTail(){
+
+function createTail(){
  const colors=[0xffd43b,0x39c9ff,0xff78a5,0x9c77ff];
- for(let i=0;i<8;i++){
+ for(let i=0;i<10;i++){
   const m=new THREE.Mesh(
    new THREE.BoxGeometry(.65,.8,.12),
    new THREE.MeshStandardMaterial({color:colors[i%4]})
   );
-  m.position.set(Math.sin(i*.65)*.4,-8-i*1.45,.1);
+  m.position.set(Math.sin(i*.6)*.35,-8-i*1.3,.1);
   tail.add(m);
  }
 }
-addTail();
+createTail();
+
 scene.add(kite);
 kite.visible=false;
 
+//==================================================
+// STRING
+//==================================================
+
+// buffer cấp phát 1 lần, cập nhật mỗi khung hình (không tạo geometry mới)
+const stringPts=new Float32Array(51*3);
+const stringGeo=new THREE.BufferGeometry();
+stringGeo.setAttribute("position",new THREE.BufferAttribute(stringPts,3));
+
 const stringLine=new THREE.Line(
- new THREE.BufferGeometry(),
- new THREE.LineBasicMaterial({color:0xffffff})
+ stringGeo,
+ new THREE.LineBasicMaterial({
+  color:0xffffff,transparent:true,opacity:.9
+ })
 );
+stringLine.frustumCulled=false;
 scene.add(stringLine);
 
+function updateString(){
+ stringLine.visible=kite.visible;
+ if(!kite.visible)return;
+
+ const hand=new THREE.Vector3(
+  player.root.position.x+.48,
+  2.7,
+  player.root.position.z-.25
+ );
+
+ // [SỬA] dây càng căng thì càng ít võng (trước đây ngược lại)
+ const sag=3*(1-tension/100);
+
+ const kp=kite.position;
+ for(let i=0;i<=50;i++){
+  const t=i/50;
+  stringPts[i*3]=hand.x+(kp.x-hand.x)*t;
+  stringPts[i*3+1]=hand.y+(kp.y-hand.y)*t-Math.sin(t*Math.PI)*sag;
+  stringPts[i*3+2]=hand.z+(kp.z-hand.z)*t;
+ }
+ stringGeo.attributes.position.needsUpdate=true;
+}
+
 //==================================================
-// TRẠNG THÁI
+// GAME STATE
 //==================================================
-let state="walking";
-let money=0,height=0,distance=0,record=0;
+
+let money=500;
+let height=0,distance=0,record=0;
 let wind=8,windAngle=0,gust=0;
-let weatherIndex=0;
-let lineLength=35,tension=0;
-let kiteLevel=0,ropeLevel=0,stabilityLevel=0;
+let tension=0,lineLength=35;
+let state="walking";
 let cameraMode=0;
+let weatherIndex=0;
+let kiteLevel=0,ropeLevel=0,stabilityLevel=0;
+let kiteVelocity=new THREE.Vector3();
 let keys={};
 let reelHeld=false;
-let steer=0;
-let launchTime=0,walkTime=0,earnTime=0;
-let flightSeconds=0;
-let playerRetreat=0;
-let kiteVelocity=new THREE.Vector3();
-let gustTimer=0;
+let flightTime=0;
 let last=performance.now();
-let clockTime=12;
+let clock=0;
+let playerRetreat=0;
+let steer=0;
 
-const weatherList=[
+const weather=[
  {name:"Nắng đẹp",wind:8,lift:1},
  {name:"Gió nhẹ",wind:4,lift:.65},
  {name:"Gió vừa",wind:13,lift:1.15},
- {name:"Gió mạnh",wind:23,lift:1.4},
- {name:"Gió giật",wind:33,lift:1.1},
- {name:"Mưa nhẹ",wind:15,lift:.75}
+ {name:"Gió mạnh",wind:19,lift:1.3},
+ {name:"Gió giật",wind:23,lift:.85},
+ {name:"Mưa nhẹ",wind:9,lift:.8}
 ];
 
-//==================================================
-// UI
-//==================================================
-function msg(s){$("message").textContent=s}
+const stateNames={
+ walking:"Đi bộ",holding:"Cầm diều",running:"Chạy lấy đà",
+ flying:"Đang bay",fallen:"Diều rơi"
+};
+
 function updateUI(){
  $("money").textContent=Math.floor(money);
- $("altitude").textContent=Math.floor(height);
- $("distance").textContent=Math.floor(distance);
- $("wind").textContent=Math.floor(wind);
+ $("shopMoney").textContent=Math.floor(money);
+ $("alt").textContent=Math.floor(height);
+ $("dist").textContent=Math.floor(distance);
  $("record").textContent=Math.floor(record);
+ $("wind").textContent=Math.floor(wind);
  $("rope").textContent=Math.floor(lineLength);
  $("tension").textContent=Math.floor(tension);
- $("weather").textContent=weatherList[weatherIndex].name;
- $("status").textContent=state;
- $("direction").textContent=["Tây","Tây Bắc","Bắc","Đông Bắc","Đông","Đông Nam","Nam","Tây Nam"][Math.round(windAngle/(Math.PI/4)+8)%8];
- $("shopMoney").textContent=Math.floor(money);
+ $("weather").textContent=weather[weatherIndex].name;
+ $("status").textContent=stateNames[state]||state;
+ $("carbon").textContent=carbonLevel().name;
 }
-function setFlightControls(show){
- $("flightControls").style.display=show?"flex":"none";
+
+function msg(s){$("message").textContent=s}
+
+let toastTimer=0;
+function toast(s){
+ $("toast").textContent=s;
+ $("toast").style.display="block";
+ clearTimeout(toastTimer); // [SỬA] tránh toast cũ tắt sớm toast mới
+ toastTimer=setTimeout(()=>$("toast").style.display="none",1800);
 }
-function setAction(text){
- $("action").textContent=text;
+
+function carbonLevel(){
+ const owned=carbonItems.filter(x=>x.owned);
+ return owned.length?owned[owned.length-1]:carbonItems[0];
 }
 
 //==================================================
-// ĐIỀU KHIỂN NHÂN VẬT
+// CARBON SHOP
 //==================================================
+
+const carbonItems=[
+ {name:"Carbon Basic",price:100,rarity:"Common",stock:5,owned:true,
+  emoji:"⚫",level:1},
+ {name:"Carbon Pro",price:500,rarity:"Rare",stock:4,owned:false,
+  emoji:"🪶",level:2},
+ {name:"Carbon Ultra",price:2000,rarity:"Epic",stock:3,owned:false,
+  emoji:"💎",level:3},
+ {name:"Carbon Master",price:5000,rarity:"Legendary",stock:2,owned:false,
+  emoji:"🌟",level:4},
+ {name:"Carbon Prismatic",price:10000,rarity:"Prismatic",stock:1,owned:false,
+  emoji:"🌈",level:5}
+];
+
+let restockSeconds=240;
+let lastRewardDay=-1;
+
+function renderShop(){
+ const container=$("shopItems");
+ container.innerHTML="";
+
+ carbonItems.forEach((item,index)=>{
+  const div=document.createElement("div");
+  div.className="item";
+
+  const icon=document.createElement("div");
+  icon.className="itemIcon";
+  icon.textContent=item.emoji;
+
+  const info=document.createElement("div");
+  info.className="itemInfo";
+
+  const title=document.createElement("h3");
+  title.textContent=item.name;
+
+  const stock=document.createElement("p");
+  stock.textContent="x"+item.stock+" Stock";
+
+  const rarity=document.createElement("span");
+  rarity.className="rarity";
+  rarity.textContent=item.rarity;
+
+  const button=document.createElement("button");
+
+  // [SỬA] kiểm tra OWNED trước, để món đã mua không hiện "NO STOCK"
+  if(item.owned){
+   button.textContent="OWNED";
+   button.disabled=true;
+   button.style.background="#777";
+  }else if(item.stock<=0){
+   button.textContent="NO STOCK";
+   button.disabled=true;
+   button.style.background="#777";
+  }else{
+   button.textContent="BUY - "+item.price+" xu";
+   button.onclick=()=>buyCarbon(index);
+  }
+
+  info.append(title,stock,rarity,button);
+  div.append(icon,info);
+  container.appendChild(div);
+ });
+}
+
+function buyCarbon(index){
+ const item=carbonItems[index];
+
+ if(item.owned){toast("Bạn đã sở hữu món này!");return}
+ if(item.stock<=0){toast("Hết hàng!");return}
+ if(money<item.price){toast("Không đủ tiền!");return}
+
+ money-=item.price;
+ item.stock--;
+ item.owned=true;
+
+ kiteLevel+=item.level*.5;
+ stabilityLevel+=item.level*.4;
+ ropeLevel+=item.level*.5;
+
+ toast("Đã mua "+item.name+"!");
+ renderShop();
+ updateUI();
+}
+
+function openShop(){
+ renderShop();
+ $("shop").style.display="grid";
+}
+function closeShop(){$("shop").style.display="none"}
+
+function restock(manual){
+ if(manual){
+  if(money<150){toast("Cần 150 xu để nhập hàng!");return}
+  money-=150;
+ }
+ carbonItems.forEach((item,i)=>{
+  item.stock=[5,4,3,2,1][i];
+ });
+ restockSeconds=240;
+ renderShop();
+ updateUI();
+ if(manual)toast("Đã nhập hàng mới!");
+}
+
+function updateRestock(dt){
+ restockSeconds-=dt;
+ if(restockSeconds<=0){
+  restock(false);
+  toast("Cửa hàng vừa nhập hàng mới!");
+ }
+ const m=Math.floor(restockSeconds/60);
+ const s=Math.floor(restockSeconds%60);
+ $("restockTimer").textContent=
+  "New stock in "+m+"m "+s+"s";
+}
+
+//==================================================
+// DAILY REWARD
+//==================================================
+
+function dailyReward(){
+ const day=Math.floor(Date.now()/86400000);
+ if(lastRewardDay===day){
+  toast("Bạn đã nhận quà hôm nay!");
+  return;
+ }
+ lastRewardDay=day;
+ money+=300;
+ updateUI();
+ toast("🎁 Nhận được 300 xu!");
+}
+
+//==================================================
+// CUSTOMIZATION
+//==================================================
+
+function openCustom(){$("custom").style.display="grid"}
+function closeCustom(){$("custom").style.display="none"}
+
+function paintKite(color){
+ kiteMats.forEach(m=>m.color.setHex(color));
+ toast("Đã đổi màu diều!");
+}
+
+//==================================================
+// WEATHER AND CAMERA
+//==================================================
+
+function changeWeather(){
+ weatherIndex=(weatherIndex+1)%weather.length;
+ toast("Thời tiết: "+weather[weatherIndex].name);
+}
+
+function changeCamera(){
+ cameraMode=(cameraMode+1)%5;
+ const names=[
+  "Theo diều","Theo nhân vật",
+  "Điện ảnh","First Person","Toàn cảnh"
+ ];
+ toast("Camera: "+names[cameraMode]);
+}
+
+function toggleGraphics(){
+ quality=(quality+1)%3;
+ // Ultra cần composer; nếu không tải được thì bỏ qua mức này
+ if(quality===2&&!composer)quality=0;
+ applyQuality();
+ toast("Đồ họa: "+QUALITY_NAMES[quality]);
+}
+
+//==================================================
+// PLAYER MOVEMENT
+//==================================================
+
 function bindMove(id,key){
  const b=$(id);
  b.addEventListener("pointerdown",e=>{
@@ -410,22 +949,44 @@ function bindMove(id,key){
   b.addEventListener(ev,()=>keys[key]=false);
  });
 }
+
 bindMove("moveUp","forward");
 bindMove("moveDown","back");
 bindMove("moveLeft","left");
 bindMove("moveRight","right");
 
+function bindHold(id,callback){
+ const b=$(id);
+ b.addEventListener("pointerdown",e=>{
+  e.preventDefault();callback(true);
+ });
+ ["pointerup","pointerleave","pointercancel"].forEach(ev=>{
+  b.addEventListener(ev,()=>callback(false));
+ });
+}
+
+bindHold("kiteLeft",v=>keys.kiteLeft=v);
+bindHold("kiteRight",v=>keys.kiteRight=v);
+bindHold("reel",v=>reelHeld=v);
+bindHold("out",v=>keys.release=v);
+
 addEventListener("keydown",e=>{
  const k=e.key.toLowerCase();
- if(["w","a","s","d","arrowleft","arrowright"].includes(k))e.preventDefault();
  if(k==="w")keys.forward=true;
  if(k==="s")keys.back=true;
  if(k==="a")keys.left=true;
  if(k==="d")keys.right=true;
  if(k==="arrowleft"||k==="q")keys.kiteLeft=true;
  if(k==="arrowright"||k==="e")keys.kiteRight=true;
- if(k===" " && state==="holding")mainAction();
+ if(k==="r")reelHeld=true;
+ if(k==="f")keys.release=true;
+ if(k==="c")changeCamera();
+ if(k===" "){
+  e.preventDefault();
+  if(state==="holding")mainAction();
+ }
 });
+
 addEventListener("keyup",e=>{
  const k=e.key.toLowerCase();
  if(k==="w")keys.forward=false;
@@ -434,393 +995,379 @@ addEventListener("keyup",e=>{
  if(k==="d")keys.right=false;
  if(k==="arrowleft"||k==="q")keys.kiteLeft=false;
  if(k==="arrowright"||k==="e")keys.kiteRight=false;
+ if(k==="r")reelHeld=false;
+ if(k==="f")keys.release=false;
 });
 
-// Điều khiển diều trên điện thoại
-function bindHold(id,callback){
- const b=$(id);
- b.addEventListener("pointerdown",e=>{e.preventDefault();callback(true)});
- ["pointerup","pointerleave","pointercancel"].forEach(ev=>b.addEventListener(ev,()=>callback(false)));
-}
-bindHold("kiteLeft",v=>keys.kiteLeft=v);
-bindHold("kiteRight",v=>keys.kiteRight=v);
-bindHold("reel",v=>reelHeld=v);
-bindHold("letout",v=>keys.release=v);
+//==================================================
+// LAUNCH
+//==================================================
 
-//==================================================
-// CẦM – CHẠY – NÉM DIỀU
-//==================================================
 function mainAction(){
  if(state==="walking"||state==="fallen"){
-  if(Math.abs(player.root.position.x)>35||player.root.position.z>25){
-   msg("Hãy đi đến bãi cỏ rộng để thả diều!");
+  if(Math.abs(player.root.position.x)>40||
+     player.root.position.z>35){
+   msg("Hãy đi đến bãi cỏ rộng!");
    return;
   }
+
   state="holding";
   kite.visible=true;
-  setAction("🏃 Chạy & ném");
-  msg("Bạn đang cầm diều. Bấm tiếp để chạy lấy đà!");
+  kite.position.set(
+   player.root.position.x+1,
+   3.8,
+   player.root.position.z-1
+  );
+  $("action").textContent="🏃 CHẠY & NÉM";
+  msg("Bạn đang cầm diều! Bấm tiếp để chạy lấy đà.");
   return;
  }
+
  if(state==="holding"){
   state="running";
-  launchTime=0;
-  setAction("Đang chạy...");
-  msg("Nhân vật đang chạy lấy đà...");
+  flightTime=0;
+  $("action").textContent="ĐANG CHẠY";
+  msg("Đang chạy lấy đà!");
  }
-}
-window.mainAction=mainAction;
-
-function startThrow(){
- state="throwing";
- launchTime=0;
- playerRetreat=0;
- msg("Nhân vật đang ném diều!");
 }
 
 function finishThrow(){
  state="flying";
- kiteVelocity.set(0,4.5,-4);
- flightSeconds=0;
+ // [SỬA] ném theo hướng ngược gió (-z) và lên cao hơn
+ kiteVelocity.set(0,6,-4);
+ flightTime=0;
  playerRetreat=0;
- setFlightControls(true);
- setAction("🪁 Đang bay");
- msg("Diều đã được ném! Camera chuyển sang theo dõi diều.");
+ tension=0;
+ $("flight").style.display="flex";
+ $("action").style.display="none";
+ msg("Diều đã bay! Hãy điều khiển và quản lý dây.");
 }
 
 //==================================================
-// CAMERA THEO DIỀU VÀ NHÂN VẬT
+// CAMERA
 //==================================================
+
 const cameraTarget=new THREE.Vector3();
 const cameraPosition=new THREE.Vector3();
 
 function updateCamera(dt){
- if(cameraMode===0 && state==="flying"){
-  // Camera theo diều nhưng vẫn nhìn thấy nhân vật bên dưới
-  const mid=new THREE.Vector3(
-   kite.position.x*.72+player.root.position.x*.28,
-   kite.position.y*.75+player.root.position.y*.25,
-   kite.position.z*.72+player.root.position.z*.28
-  );
-  cameraTarget.set(mid.x,mid.y,mid.z);
+ const hasKite=kite.visible;
+ // [SỬA] chế độ 0 khi chưa có diều từng rơi vào nhánh "Toàn cảnh"
+ const target=hasKite?kite.position:player.root.position;
+ const smooth=1-Math.exp(-dt*3.5);
 
+ if(cameraMode===0){
+  cameraTarget.copy(target);
+  if(!hasKite)cameraTarget.y+=2;
   cameraPosition.set(
-   mid.x+12,
-   Math.max(10,mid.y+9),
-   mid.z+27
+   target.x+10,
+   target.y+(hasKite?7:8),
+   target.z+(hasKite?19:15)
   );
  }else if(cameraMode===1){
   cameraTarget.copy(player.root.position);
-  cameraTarget.y+=2.5;
+  cameraTarget.y+=2;
   cameraPosition.set(
-   player.root.position.x+12,
-   9,
-   player.root.position.z+22
+   player.root.position.x+8,8,
+   player.root.position.z+15
   );
- }else{
-  const target=kite.visible?kite.position:player.root.position;
+ }else if(cameraMode===2){
   cameraTarget.copy(target);
-  cameraPosition.set(target.x+17,target.y+12,target.z+27);
+  if(!hasKite)cameraTarget.y+=2;
+  cameraPosition.set(
+   target.x+Math.sin(clock*.3)*19,
+   target.y+8,
+   target.z+Math.cos(clock*.3)*19
+  );
+ }else if(cameraMode===3){
+  cameraTarget.copy(player.root.position);
+  cameraTarget.y+=2.7;
+  cameraPosition.copy(cameraTarget);
+  cameraPosition.z-=.2;
+  if(hasKite)cameraTarget.lerp(kite.position,.3);
+ }else{
+  cameraTarget.copy(target);
+  cameraPosition.set(target.x+25,target.y+20,target.z+35);
  }
 
- camera.position.lerp(cameraPosition,Math.min(1,dt*3.5));
+ camera.position.lerp(cameraPosition,smooth);
  camera.lookAt(cameraTarget);
 }
 
 //==================================================
-// DÂY DIỀU
+// MAIN PHYSICS
 //==================================================
-function updateString(){
- if(!kite.visible)return;
+
+let earned=0;
+let turbulence=0;
+
+function physics(dt,now){
+ if(state!=="flying")return;
+
+ flightTime+=dt;
+
+ const weatherData=weather[weatherIndex];
+ // [SỬA] trước đây wind/10 (≈0.8) quá yếu nên diều luôn rơi ngay
+ const windPower=wind*.45*weatherData.lift;
+
+ const steering=
+  (keys.kiteRight?1:0)-(keys.kiteLeft?1:0);
+
+ steer=steering;
+
+ if(reelHeld)lineLength=Math.max(10,lineLength-8*dt);
+ if(keys.release)lineLength=Math.min(
+  120+ropeLevel*35,lineLength+10*dt
+ );
+
+ // [SỬA] gió thổi về phía -z (ra xa người chơi) để diều bay lên khi dây căng
+ const windVector=new THREE.Vector3(
+  Math.sin(windAngle)*windPower,
+  turbulence*.02,
+  -Math.cos(windAngle)*windPower
+ );
+
+ const relativeWind=windVector.clone().sub(kiteVelocity);
+ const speed=relativeWind.length();
+
+ // LIFT
+ const liftForce=Math.min(
+  12,speed*speed*.35*(.7+kiteLevel*.08)
+ );
+
+ const lift=new THREE.Vector3(
+  relativeWind.x*.01,
+  1,
+  relativeWind.z*.01
+ ).normalize().multiplyScalar(liftForce);
+
+ // DRAG (kéo diều trôi theo gió)
+ const drag=relativeWind.clone().multiplyScalar(
+  Math.min(.6,speed*.08)
+ );
+
+ // GRAVITY
+ const gravity=new THREE.Vector3(0,-2.25,0);
+
+ // STEERING
+ const steeringForce=new THREE.Vector3(steering*5,0,0);
+
+ kiteVelocity.addScaledVector(lift,dt);
+ kiteVelocity.addScaledVector(drag,dt);
+ kiteVelocity.addScaledVector(gravity,dt);
+ kiteVelocity.addScaledVector(steeringForce,dt);
+
+ kiteVelocity.multiplyScalar(Math.pow(.985,dt*60));
+
+ kiteVelocity.x=clamp(kiteVelocity.x,-9,9);
+ kiteVelocity.y=clamp(kiteVelocity.y,-5,8);
+ kiteVelocity.z=clamp(kiteVelocity.z,-9,6);
+
+ kite.position.addScaledVector(kiteVelocity,dt);
+
+ // ROPE TENSION
  const hand=new THREE.Vector3(
   player.root.position.x+.48,
   2.7,
   player.root.position.z-.25
  );
- const pts=[];
- for(let i=0;i<=35;i++){
-  const t=i/35;
-  const p=hand.clone().lerp(kite.position,t);
-  p.y-=Math.sin(t*Math.PI)*Math.min(2,tension*.025);
-  pts.push(p);
+
+ const diff=kite.position.clone().sub(hand);
+ const actual=diff.length();
+ const maxLength=lineLength*.94;
+
+ tension=clamp((actual/maxLength-.68)*210,0,100);
+
+ if(actual>maxLength){
+  const dir=diff.normalize();
+  kite.position.copy(hand.clone().addScaledVector(dir,maxLength));
+  const outward=kiteVelocity.dot(dir);
+  if(outward>0){
+   kiteVelocity.addScaledVector(
+    dir,-outward*(.82+stabilityLevel*.025)
+   );
+  }
  }
- stringLine.geometry.dispose();
- stringLine.geometry=new THREE.BufferGeometry().setFromPoints(pts);
+
+ // KITE ANIMATION
+ kite.rotation.z=Math.sin(now*.002)*.1-
+  kiteVelocity.x*.025-steer*.08;
+
+ kite.rotation.x=Math.sin(now*.0015)*.1;
+ kite.rotation.y=steer*.12+Math.sin(now*.001)*.15;
+
+ tail.rotation.z=Math.sin(now*.004)*.15;
+
+ height=Math.max(0,kite.position.y);
+ distance=Math.sqrt(
+  Math.pow(kite.position.x-player.root.position.x,2)+
+  Math.pow(kite.position.z-player.root.position.z,2)
+ );
+
+ record=Math.max(record,height);
+
+ earned+=dt;
+ if(earned>=1){
+  earned=0;
+  money+=Math.max(1,Math.floor(
+   height*.055+distance*.02+windPower*.35
+  ));
+ }
+
+ // [SỬA] có thời gian ân hạn sau khi ném, tránh rơi ngay lập tức
+ if(flightTime>2&&height<=1.5){
+  height=0;
+  tension=0;
+  state="fallen";
+  kite.visible=false;
+  $("flight").style.display="none";
+  $("action").style.display="block";
+  $("action").textContent="🪁 NHẶT DIỀU";
+  msg("Diều đã hạ xuống. Hãy nhặt lại!");
+ }
 }
 
 //==================================================
-// CỬA HÀNG
+// ANIMATION
 //==================================================
-const upgrades=[
- {name:"Diều cánh lớn",price:100,desc:"Tăng lực nâng",buy:()=>kiteLevel++},
- {name:"Dây dài",price:150,desc:"Tăng phạm vi bay",buy:()=>ropeLevel++},
- {name:"Dây chắc",price:250,desc:"Giảm tác động gió giật",buy:()=>stabilityLevel++},
- {name:"Diều siêu nhẹ",price:400,desc:"Tăng khả năng bay",buy:()=>kiteLevel+=2},
- {name:"Cuộn dây tốt",price:550,desc:"Tăng khả năng kiểm soát",buy:()=>ropeLevel+=2}
-];
-window.openShop=()=>{
- $("shop").style.display="grid";
- $("shopItems").innerHTML="";
- upgrades.forEach(u=>{
-  const div=document.createElement("div");
-  div.className="item";
-  div.textContent=u.name+" – "+u.desc+" – "+u.price+" xu";
-  const b=document.createElement("button");
-  b.textContent="Mua";
-  b.onclick=()=>{
-   if(money<u.price){msg("Không đủ tiền!");return}
-   money-=u.price;
-   u.buy();
-   u.price=Math.floor(u.price*1.6);
-   openShop();
-   updateUI();
-  };
-  div.appendChild(b);
-  $("shopItems").appendChild(div);
- });
-};
-window.closeShop=()=>$("shop").style.display="none";
 
-//==================================================
-// TRANG TRÍ
-//==================================================
-window.openCustom=()=>{
- $("custom").style.display="grid";
- $("colors").innerHTML="";
- kiteColors.forEach((c,i)=>{
-  const b=document.createElement("button");
-  b.style.background="#"+c.toString(16).padStart(6,"0");
-  b.textContent="Màu "+(i+1);
-  b.onclick=()=>{
-   kiteMats.forEach((m,j)=>m.color.setHex(kiteColors[(i+j)%kiteColors.length]));
-   msg("Đã đổi màu diều!");
-  };
-  $("colors").appendChild(b);
- });
-};
-window.closeCustom=()=>$("custom").style.display="none";
-window.addStars=()=>{addStars();msg("Đã thêm sao vào diều!")};
-window.addTail=()=>{addTail();msg("Đã thêm đuôi diều!")};
+let uiTimer=0;
+let gustTimer=0;
+let clockTime=12;
 
-//==================================================
-// THỜI TIẾT
-//==================================================
-window.changeWeather=()=>{
- weatherIndex=(weatherIndex+1)%weatherList.length;
- wind=weatherList[weatherIndex].wind;
- msg("Thời tiết: "+weatherList[weatherIndex].name);
- updateUI();
-};
-window.changeCamera=()=>{
- cameraMode=(cameraMode+1)%3;
- msg(["Camera theo dõi diều","Camera nhân vật","Camera toàn cảnh diều"][cameraMode]);
-};
-
-//==================================================
-// VÒNG LẶP
-//==================================================
 function animate(now){
  requestAnimationFrame(animate);
+
  const dt=Math.min((now-last)/1000,.035);
  last=now;
+ clock+=dt;
 
- const w=weatherList[weatherIndex];
+ // WEATHER
+ const w=weather[weatherIndex];
+
  gustTimer-=dt;
  if(gustTimer<=0){
   gustTimer=2+Math.random()*3;
   gust=(Math.random()-.5)*wind*.6;
-  windAngle+=(Math.random()-.5)*.6;
+  windAngle=clamp(windAngle+(Math.random()-.5)*.5,-.7,.7);
  }
- wind+=(w.wind-wind)*dt*.12;
+ wind+=(w.wind-wind)*dt*.1;
+ turbulence+=(gust-turbulence)*dt*1.5;
+ gust*=Math.pow(.985,dt*60);
 
- if(state==="walking"||state==="holding"||state==="running"||state==="flying"){
-  // Nhân vật có thể di chuyển cả khi diều đang bay
+ // PLAYER
+ // [SỬA] thêm "fallen" để người chơi còn đi lại được sau khi diều rơi
+ if(["walking","holding","running","flying","fallen"].includes(state)){
   const forward=(keys.forward?1:0)-(keys.back?1:0);
-  const sideways=(keys.right?1:0)-(keys.left?1:0);
-  const moving=forward!==0||sideways!==0;
+  const side=(keys.right?1:0)-(keys.left?1:0);
+  const moving=forward!==0||side!==0;
   const speed=state==="running"?7.5:4.5;
 
   player.root.position.z-=forward*speed*dt;
-  player.root.position.x+=sideways*speed*dt;
-  player.root.position.x=THREE.MathUtils.clamp(player.root.position.x,-110,110);
-  player.root.position.z=THREE.MathUtils.clamp(player.root.position.z,-250,40);
+  player.root.position.x+=side*speed*dt;
 
-  if(moving){
-   player.root.rotation.y=Math.atan2(sideways,-forward);
-  }
-  walkTime+=dt*(state==="running"?12:7);
+  player.root.position.x=clamp(player.root.position.x,-110,110);
+  player.root.position.z=clamp(player.root.position.z,-250,40);
+
+  if(moving)player.root.rotation.y=Math.atan2(side,-forward);
+
   player.limbs.forEach(l=>{
-   const swing=moving?Math.sin(walkTime)*.65:0;
-   l.obj.rotation.x=swing*(l.type==="arm"?-1:1);
+   l.obj.rotation.x=moving?Math.sin(clock*9)*.55:0;
   });
  }
 
- // Cầm diều
  if(state==="holding"){
   kite.visible=true;
-  kite.position.set(player.root.position.x+1,3.8,player.root.position.z-1);
-  kite.rotation.z=-.25;
- }
-
- // Chạy lấy đà
- if(state==="running"){
-  launchTime+=dt;
-  player.root.position.z-=7*dt;
-  if(launchTime>=1.1)startThrow();
- }
-
- // Ném diều
- if(state==="throwing"){
-  launchTime+=dt;
-  const t=Math.min(launchTime/1.15,1);
   kite.position.set(
-   player.root.position.x+.7+Math.sin(t*Math.PI)*1.4,
-   3.5+Math.sin(t*Math.PI/2)*7,
-   player.root.position.z-2-t*5
+   player.root.position.x+1,
+   3.8,
+   player.root.position.z-1
   );
-  kite.rotation.z=-.4+t*.6;
-
-  player.limbs.forEach(l=>{
-   if(l.type==="arm"&&l.side===1)l.obj.rotation.x=-1.5+Math.sin(t*Math.PI)*.3;
-  });
-
-  if(t>=1){
-   finishThrow();
-  }
  }
 
- // Sau khi ném, nhân vật chạy lùi khỏi vị trí ném
- if(state==="flying" && playerRetreat<1){
-  const retreatSpeed=5;
-  const amount=Math.min(retreatSpeed*dt,4-playerRetreat);
+ if(state==="running"){
+  flightTime+=dt;
+  player.root.position.z-=7*dt;
+  if(flightTime>1.1)finishThrow();
+ }
+
+ if(state==="flying"&&playerRetreat<4){
+  const amount=Math.min(5*dt,4-playerRetreat);
   player.root.position.z+=amount;
   playerRetreat+=amount;
-  player.root.rotation.y=Math.PI;
-  player.limbs.forEach(l=>{
-   l.obj.rotation.x=Math.sin(now*.018)*(l.type==="leg"?.6:.35);
-  });
  }
 
- // Vật lý diều
- if(state==="flying"){
-  flightSeconds+=dt;
-  const windPower=wind/10*w.lift;
-  const liftForce=windPower*.85*(1+kiteLevel*.14);
-  const gravity=1.65;
+ physics(dt,now);
 
-  // Điều khiển hướng diều trái/phải
-  const steering=(keys.kiteRight?1:0)-(keys.kiteLeft?1:0);
-  steer=steering;
-  kiteVelocity.x+=steering*5*dt;
-  kiteVelocity.x+=Math.cos(windAngle)*windPower*.08*dt;
-  kiteVelocity.z+=Math.sin(windAngle)*windPower*.08*dt;
-
-  // Kéo và nhả dây
-  if(reelHeld)lineLength=Math.max(8,lineLength-10*dt);
-  if(keys.release)lineLength=Math.min(100+ropeLevel*30,lineLength+12*dt);
-
-  // Lực nâng và trọng lực
-  kiteVelocity.y+=(liftForce-gravity)*dt;
-  kiteVelocity.y+=gust*.025*dt;
-  kiteVelocity.y-=.35*dt;
-
-  // Ổn định và giới hạn vận tốc
-  kiteVelocity.x*=Math.pow(.92,dt*10);
-  kiteVelocity.z*=Math.pow(.96,dt*10);
-  kiteVelocity.y=THREE.MathUtils.clamp(kiteVelocity.y,-4,7);
-  kiteVelocity.x=THREE.MathUtils.clamp(kiteVelocity.x,-6,6);
-  kiteVelocity.z=THREE.MathUtils.clamp(kiteVelocity.z,-8,5);
-
-  kite.position.addScaledVector(kiteVelocity,dt);
-
-  // Giới hạn dây tính từ tay người chơi
-  const hand=new THREE.Vector3(
-   player.root.position.x,
-   2.5,
-   player.root.position.z
-  );
-  const diff=kite.position.clone().sub(hand);
-  const actualLength=diff.length();
-  const maxLength=lineLength*.8;
-  tension=THREE.MathUtils.clamp((actualLength/maxLength-.7)*180,0,100);
-
-  if(actualLength>maxLength){
-   const dir=diff.normalize();
-   kite.position.copy(hand.clone().addScaledVector(dir,maxLength));
-   const outward=kiteVelocity.dot(dir);
-   if(outward>0)kiteVelocity.addScaledVector(dir,-outward*.85);
-  }
-
-  // Chuyển động diều
-  kite.rotation.z=Math.sin(now*.002)*.14-kiteVelocity.x*.035;
-  kite.rotation.x=Math.sin(now*.0015)*.12;
-  kite.rotation.y=steering*.12+Math.sin(now*.001)*.15;
-  tail.rotation.z=Math.sin(now*.004)*.12;
-
-  height=kite.position.y;
-  distance=Math.sqrt(
-   Math.pow(kite.position.x-player.root.position.x,2)+
-   Math.pow(kite.position.z-player.root.position.z,2)
-  );
-  record=Math.max(record,height);
-
-  // Tiền thưởng
-  earnTime+=dt;
-  if(earnTime>=1){
-   earnTime=0;
-   money+=Math.max(1,Math.floor(height*.06+distance*.025+windPower*.4));
-  }
-
-  if(height<=1.5){
-   height=0;
-   state="fallen";
-   kite.visible=false;
-   setFlightControls(false);
-   setAction("🪁 Nhặt diều");
-   msg("Diều đã rơi! Di chuyển đến gần và nhặt lại.");
-  }
- }
-
- // NPC
- npcs.forEach(n=>{
-  n.angle+=dt*n.speed*.12;
-  n.root.position.x=n.cx+Math.cos(n.angle)*n.radius;
-  n.root.position.z=n.cz+Math.sin(n.angle)*n.radius;
-  n.root.rotation.y=-n.angle;
-  n.phase+=dt*5;
-  n.limbs.forEach(l=>{
-   l.obj.rotation.x=Math.sin(n.phase)*(l.type==="leg"?.4:.2);
-  });
- });
-
+ // CLOUD MOVEMENT
  clouds.forEach(c=>{
   c.position.x+=wind*.012*dt;
   if(c.position.x>250)c.position.x=-250;
  });
- trees.forEach((t,i)=>t.rotation.z=Math.sin(now*.0007+i)*.015);
 
- // Ngày đêm
+ // TREE WIND
+ trees.forEach((t,i)=>{
+  t.rotation.z=Math.sin(clock*.7+i)*.015;
+ });
+
+ // DAY NIGHT
  clockTime+=dt*.008;
  const daylight=(Math.sin(clockTime)+1)/2;
- sun.intensity=.45+daylight*1.8;
+ sun.intensity=.4+daylight*1.1;
+ ambient.intensity=.08+daylight*.1;
+ sunBall.material.color.setHSL(
+  .12,.7,.7+daylight*.2
+ );
 
+ // [SỬA] bóng đổ đi theo người chơi (trước đây chỉ phủ vùng quanh gốc tọa độ)
+ sun.target.position.set(player.root.position.x,0,player.root.position.z);
+ sun.position.set(
+  player.root.position.x-80,130,player.root.position.z+60
+ );
+
+ updateRestock(dt);
  updateString();
  updateCamera(dt);
- updateUI();
- renderer.render(scene,camera);
+ // cập nhật HUD ~8 lần/giây thay vì mỗi khung hình (DOM rất tốn)
+ uiTimer-=dt;
+ if(uiTimer<=0){
+  uiTimer=.12;
+  updateUI();
+ }
+
+ if(composer&&quality===2)composer.render();
+ else renderer.render(scene,camera);
 }
 
 //==================================================
-// KHỞI ĐỘNG
+// EXPOSE (onclick trong HTML cần hàm global)
 //==================================================
+
+// [SỬA QUAN TRỌNG] toàn bộ code nằm trong IIFE nên các nút onclick="..."
+// không thấy hàm -> báo ReferenceError. Phải gắn vào window.
+Object.assign(window,{
+ openShop,closeShop,restock,dailyReward,
+ openCustom,closeCustom,paintKite,addDecoration,
+ changeCamera,changeWeather,toggleGraphics,mainAction
+});
+
+//==================================================
+// START
+//==================================================
+
 updateUI();
+renderShop();
+
+$("flight").style.display="none";
+
 requestAnimationFrame(animate);
 
 addEventListener("resize",()=>{
  camera.aspect=innerWidth/innerHeight;
  camera.updateProjectionMatrix();
- renderer.setSize(innerWidth,innerHeight);
+ applyQuality();
 });
+
 })();
 </script>
 </body>
