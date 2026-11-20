@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>KITE WORLD ULTRA 3D</title>
+<title>KITE WORLD ULTRA 3D - Nâng cấp thực tế</title>
 
 <style>
 *{box-sizing:border-box}
@@ -57,17 +57,27 @@ button:active{transform:translateY(3px)}
  max-width:90%;font-size:13px;
 }
 #move{
- position:fixed;bottom:15px;left:12px;
- display:grid;
- grid-template-columns:48px 48px 48px;
- grid-template-rows:48px 48px;
- gap:4px;z-index:6;
+ position:fixed;bottom:25px;left:20px;
+ width:120px;height:120px;
+ z-index:6;
 }
-#move button{padding:0;background:#174b70dd;font-size:20px}
-#moveUp{grid-column:2}
-#moveLeft{grid-column:1;grid-row:2}
-#moveDown{grid-column:2;grid-row:2}
-#moveRight{grid-column:3;grid-row:2}
+#joystick{
+ width:120px;height:120px;
+ background:rgba(23,75,112,0.6);
+ border:3px solid #ffffff55;
+ border-radius:50%;
+ position:relative;
+ touch-action:none;
+}
+#stick{
+ width:50px;height:50px;
+ background:linear-gradient(#4aa3ff,#1a6bcc);
+ border-radius:50%;
+ position:absolute;
+ top:35px;left:35px;
+ box-shadow:0 2px 8px #0008;
+ pointer-events:none;
+}
 #flight{
  position:fixed;bottom:17px;right:12px;
  display:flex;gap:7px;z-index:6;
@@ -80,7 +90,7 @@ button:active{transform:translateY(3px)}
  z-index:7;background:linear-gradient(#24d78b,#087c4d);
 }
 #action:active{transform:translateX(-50%) translateY(3px)}
-#shop,#custom{
+#shop,#custom,#backpack,#sell{
  position:fixed;inset:0;
  display:none;place-items:center;
  background:#0009;z-index:20;
@@ -133,7 +143,7 @@ button:active{transform:translateY(3px)}
  background:#432719;
 }
 .footer button{flex:1}
-#closeShop{background:#d83232}
+#closeShop,#closeBackpack,#closeSell{background:#d83232}
 #restock{background:#ffbb20;color:#432000}
 #toast{
  position:fixed;top:48%;left:50%;
@@ -168,23 +178,30 @@ button:active{transform:translateY(3px)}
  <div>🧵 Dây: <b id="rope">35</b> m</div>
  <div>⚡ Căng dây: <b id="tension">0</b>%</div>
  <div>🪶 Carbon: <b id="carbon">Basic</b></div>
+ <div>🪁 Diều: <b id="kiteName">Basic</b></div>
  <div>🌤️ Thời tiết: <b id="weather">Nắng đẹp</b></div>
  <div>🪁 Trạng thái: <b id="status">Đi bộ</b></div>
+ <div>💪 Độ bền: <b id="durability">100</b>%</div>
 </div>
 
 <div id="right">
  <button onclick="openShop()">🛒 CỬA HÀNG</button>
+ <button onclick="openBackpack()">🎒 BALO</button>
+ <button onclick="saveGameWithCode()">💾 LƯU MÃ</button>
+ <button onclick="loadGameWithCode()">📂 TẢI MÃ</button>
+ <button onclick="trySell()">♻️ BÁN ĐỒ</button>
  <button onclick="changeCamera()">📷 CAMERA</button>
  <button onclick="changeWeather()">🌦️ THỜI TIẾT</button>
  <button onclick="toggleGraphics()">✨ GRAPHICS</button>
  <button onclick="openCustom()">🎨 TRANG TRÍ</button>
+ <button onclick="toggleSound()" id="soundBtn">🔊 ÂM THANH</button>
+ <button onclick="showTutorial()">📖 HƯỚNG DẪN</button>
 </div>
 
 <div id="move">
- <button id="moveUp">▲</button>
- <button id="moveLeft">◀</button>
- <button id="moveDown">▼</button>
- <button id="moveRight">▶</button>
+ <div id="joystick">
+  <div id="stick"></div>
+ </div>
 </div>
 
 <div id="flight" style="display:none">
@@ -196,15 +213,58 @@ button:active{transform:translateY(3px)}
 
 <button id="action" onclick="mainAction()">🪁 CẦM DIỀU</button>
 
-<div id="message">Chào mừng đến KITE WORLD!</div>
+<div id="message">Chào mừng đến KITE WORLD ULTRA! Mua thiết bị, trang bị từ balo, cẩn thận gió mạnh!</div>
 <div id="toast"></div>
 
-<!-- CARBON SHOP -->
+<!-- Tutorial Modal -->
+<div id="tutorial" style="position:fixed;inset:0;display:none;place-items:center;background:#0009;z-index:40;backdrop-filter:blur(8px)">
+ <div class="window" style="width:min(520px,92vw)">
+  <div class="windowHeader">
+   <h2>📖 Hướng dẫn chơi</h2>
+   <button onclick="closeTutorial()" style="background:#d83232">X</button>
+  </div>
+  <div class="windowBody" style="font-size:14px;line-height:1.6">
+   <p><b>1. Di chuyển:</b> Kéo cục joystick bên trái hoặc dùng phím WASD.</p>
+   <p><b>2. Thả diều:</b> Đi đến bãi cỏ rộng → bấm <b>CẦM DIỀU</b> → bấm tiếp để chạy lấy đà.</p>
+   <p><b>3. Điều khiển khi bay:</b><br>
+   • ◀ ▶ : lái diều trái/phải<br>
+   • ⬆ KÉO : thu dây<br>
+   • ⬇ NHẢ : thả dây dài hơn</p>
+   <p><b>4. Shop & Balo:</b> Mua Diều / Dây / Nan ở Cửa hàng → vào Balo để trang bị.</p>
+   <p><b>5. Cẩn thận:</b> Gió mạnh + đồ yếu → diều cong, lắc, có thể gãy hoặc đứt dây!</p>
+   <p><b>6. Lưu game:</b> Dùng nút <b>💾 LƯU MÃ</b> để nhập mã lưu, <b>📂 TẢI MÃ</b> để tải lại.</p>
+   <p style="text-align:center;margin-top:16px">
+    <button onclick="closeTutorial()" style="padding:12px 30px;font-size:16px">Đã hiểu, chơi thôi!</button>
+   </p>
+  </div>
+ </div>
+</div>
+
+<!-- Code Input Modal -->
+<div id="codeModal" style="position:fixed;inset:0;display:none;place-items:center;background:#0009;z-index:30;backdrop-filter:blur(6px)">
+ <div class="window" style="width:min(380px,90vw)">
+  <div class="windowHeader">
+   <h2 id="codeTitle">Nhập mã</h2>
+   <button onclick="closeCodeModal()" style="background:#d83232">X</button>
+  </div>
+  <div class="windowBody" style="text-align:center">
+   <input id="codeInput" type="text" placeholder="Nhập mã (ví dụ: kite123)" style="width:100%;padding:12px;font-size:16px;border-radius:8px;border:2px solid #874627;margin-bottom:12px">
+   <button id="codeConfirm" onclick="confirmCode()" style="width:100%;padding:12px;font-size:16px">Xác nhận</button>
+  </div>
+ </div>
+</div>
+
+<!-- SHOP -->
 <div id="shop">
  <div class="window">
   <div class="windowHeader">
-   <h2>🪁 CARBON & KITE SHOP</h2>
+   <h2>🪁 CỬA HÀNG THIẾT BỊ</h2>
    <button id="closeShop" onclick="closeShop()">X</button>
+  </div>
+  <div style="display:flex;gap:6px;padding:8px;background:#3e2718">
+   <button onclick="setShopTab('kite')" style="flex:1;background:#c45a2a">🪁 Diều</button>
+   <button onclick="setShopTab('string')" style="flex:1;background:#2a6ac4">🧵 Dây</button>
+   <button onclick="setShopTab('carbon')" style="flex:1;background:#2ac45a">🪶 Nan</button>
   </div>
   <div class="windowHeader">
    <b id="restockTimer">New stock in 4m 00s</b>
@@ -214,6 +274,34 @@ button:active{transform:translateY(3px)}
   <div class="footer">
    <button>💰 <span id="shopMoney">0</span> xu</button>
    <button onclick="dailyReward()">🎁 DAILY GIFT</button>
+  </div>
+ </div>
+</div>
+
+<!-- BACKPACK -->
+<div id="backpack">
+ <div class="window">
+  <div class="windowHeader">
+   <h2>🎒 BALO TRANG BỊ</h2>
+   <button id="closeBackpack" onclick="closeBackpack()">X</button>
+  </div>
+  <div class="windowBody" id="backpackItems"></div>
+  <div class="footer">
+   <button onclick="closeBackpack()">ĐÓNG</button>
+  </div>
+ </div>
+</div>
+
+<!-- SELL ZONE -->
+<div id="sell">
+ <div class="window">
+  <div class="windowHeader">
+   <h2>♻️ BÁN ĐỒNG NÁT</h2>
+   <button id="closeSell" onclick="closeSell()">X</button>
+  </div>
+  <div class="windowBody" id="sellItems"></div>
+  <div class="footer">
+   <button onclick="closeSell()">ĐÓNG</button>
   </div>
  </div>
 </div>
@@ -236,6 +324,14 @@ button:active{transform:translateY(3px)}
  </div>
 </div>
 
+<!-- FIX: expose tutorial close handler globally for inline onclick -->
+<script>
+window.closeTutorial = function closeTutorial(){
+  const tutorial = document.getElementById("tutorial");
+  if (tutorial) tutorial.style.display = "none";
+};
+</script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
@@ -251,7 +347,6 @@ button:active{transform:translateY(3px)}
 
 const $=id=>document.getElementById(id);
 
-// [SỬA] kiểm tra THREE TRƯỚC khi dùng THREE.MathUtils
 if(!window.THREE){
  $("message").textContent="Không tải được Three.js. Kiểm tra Internet.";
  return;
@@ -288,7 +383,7 @@ document.body.appendChild(renderer.domElement);
 
 let composer=null;
 let bloom=null;
-let quality=1; // 0=Tiết kiệm, 1=Cân bằng, 2=Ultra
+let quality=1;
 const QUALITY_NAMES=["TIẾT KIỆM (mượt nhất)","CÂN BẰNG","ULTRA (bloom)"];
 
 function setupPost(){
@@ -301,7 +396,6 @@ function setupPost(){
    .18,.45,.97
   );
   composer.addPass(bloom);
-  // composer không tự mã hóa sRGB -> thêm gamma để không bị tối/lệch màu
   if(THREE.GammaCorrectionShader){
    composer.addPass(new THREE.ShaderPass(THREE.GammaCorrectionShader));
   }
@@ -386,7 +480,6 @@ const grassMat=new THREE.MeshStandardMaterial({
  color:0x39853c,roughness:1
 });
 const grass=new THREE.InstancedMesh(grassGeo,grassMat,3500);
-// [SỬA] InstancedMesh r128 dùng bounding của 1 cỏ -> bị culling mất khi gốc ngoài màn hình
 grass.frustumCulled=false;
 const dummy=new THREE.Object3D();
 
@@ -442,6 +535,21 @@ for(let i=0;i<13;i++){
  h.position.set((i-6)*55,-7,-270-Math.random()*30);
  scene.add(h);
 }
+
+// Sell zone stall
+const stall=new THREE.Mesh(
+ new THREE.BoxGeometry(4,3,3),
+ new THREE.MeshStandardMaterial({color:0x8b4513})
+);
+stall.position.set(70,1.5,20);
+scene.add(stall);
+const stallSign=new THREE.Mesh(
+ new THREE.PlaneGeometry(3,1),
+ new THREE.MeshBasicMaterial({color:0xffcc00})
+);
+stallSign.position.set(70,3.5,20);
+stallSign.rotation.y=Math.PI;
+scene.add(stallSign);
 
 //==================================================
 // TREES
@@ -568,109 +676,229 @@ const player=createPerson();
 player.root.position.set(0,0,8);
 
 //==================================================
-// KITE MODEL
+// KITE MODEL SYSTEM
 //==================================================
 
 const kite=new THREE.Group();
-const colors=[0xff3434,0x258fff,0xffdc35,0xa44bff];
+scene.add(kite);
+kite.visible=false;
 
-const kiteMats=colors.map(c=>
- new THREE.MeshStandardMaterial({
-  color:c,side:THREE.DoubleSide,
-  roughness:.35,metalness:.12
- })
-);
+const kiteMats=[];
+let currentKiteType="basic";
 
-function triangle(a,b,c,mat){
- const geo=new THREE.BufferGeometry();
- geo.setAttribute(
-  "position",
-  new THREE.Float32BufferAttribute([...a,...b,...c],3)
- );
- geo.computeVertexNormals();
+function clearKite(){
+ while(kite.children.length>0){
+  kite.remove(kite.children[0]);
+ }
+ kiteMats.length=0;
+}
+
+function createBasicKite(){
+ clearKite();
+ const colors=[0xff2222,0x2266ff,0xffee33,0xcc44ff];
+ colors.forEach(c=>{
+  kiteMats.push(new THREE.MeshStandardMaterial({
+   color:c,side:THREE.DoubleSide,roughness:.25,metalness:.15,emissive:c,emissiveIntensity:0.08
+  }));
+ });
+ function triangle(a,b,c,mat){
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute("position",new THREE.Float32BufferAttribute([...a,...b,...c],3));
+  geo.computeVertexNormals();
+  const mesh=new THREE.Mesh(geo,mat);
+  mesh.castShadow=true;
+  kite.add(mesh);
+ }
+ triangle([0,0,.05],[-4.2,-5.2,.05],[0,-7.5,.05],kiteMats[0]);
+ triangle([0,0,.05],[0,-7.5,.05],[4.2,-5.2,.05],kiteMats[1]);
+ triangle([0,0,.05],[0,5.2,.05],[-4.2,-5.2,.05],kiteMats[2]);
+ triangle([0,0,.05],[4.2,-5.2,.05],[0,5.2,.05],kiteMats[3]);
+ // Border lines for prettier look
+ const borderMat=new THREE.MeshStandardMaterial({color:0xffffff,metalness:.3,roughness:.4});
+ function rod(a,b,radius=0.06){
+  const d=new THREE.Vector3().subVectors(b,a);
+  const m=new THREE.Mesh(new THREE.CylinderGeometry(radius,radius,d.length(),12),borderMat);
+  m.position.copy(a).add(b).multiplyScalar(.5);
+  m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize());
+  kite.add(m);
+ }
+ rod(new THREE.Vector3(0,-7.5,.12),new THREE.Vector3(0,5.2,.12));
+ rod(new THREE.Vector3(-4.2,-5.2,.12),new THREE.Vector3(4.2,-5.2,.12));
+ addTailAndStars();
+}
+
+function createWideKite(){ // chi tiết hơn, gần giống hình: cánh rộng, trung tâm vàng, logo, phần dưới đỏ
+ clearKite();
+ const yellow=new THREE.MeshStandardMaterial({color:0xffe033,side:THREE.DoubleSide,roughness:.18,metalness:.12,emissive:0xffcc00,emissiveIntensity:0.22});
+ const red=new THREE.MeshStandardMaterial({color:0xee2233,side:THREE.DoubleSide,roughness:.22,emissive:0xcc1122,emissiveIntensity:0.12});
+ const black=new THREE.MeshStandardMaterial({color:0x1a1a1a,side:THREE.DoubleSide,roughness:.28});
+ const accent=new THREE.MeshStandardMaterial({color:0xffee55,side:THREE.DoubleSide,emissive:0xffcc00,emissiveIntensity:0.28});
+ const darkRed=new THREE.MeshStandardMaterial({color:0xaa1122,side:THREE.DoubleSide});
+ kiteMats.push(yellow,red,black,accent,darkRed);
+
+ // Trung tâm vàng lớn
+ const circle=new THREE.Mesh(new THREE.CircleGeometry(2.6,48),yellow);
+ circle.position.z=.07;
+ kite.add(circle);
+ const innerRing=new THREE.Mesh(new THREE.RingGeometry(1.9,2.15,40),black);
+ innerRing.position.z=.09;
+ kite.add(innerRing);
+ const inner=new THREE.Mesh(new THREE.CircleGeometry(1.75,36),new THREE.MeshStandardMaterial({color:0xffbb00,side:THREE.DoubleSide,emissive:0xff9900,emissiveIntensity:0.3}));
+ inner.position.z=.1;
+ kite.add(inner);
+
+ // Cánh rộng cong mềm
+ const wingShape=new THREE.Shape();
+ wingShape.moveTo(-9.2,0.1);
+ wingShape.quadraticCurveTo(-5.5,4.0,0,3.4);
+ wingShape.quadraticCurveTo(5.5,4.0,9.2,0.1);
+ wingShape.quadraticCurveTo(5.5,-3.2,0,-2.9);
+ wingShape.quadraticCurveTo(-5.5,-3.2,-9.2,0.1);
+ const wingGeo=new THREE.ShapeGeometry(wingShape);
+ const wings=new THREE.Mesh(wingGeo,red);
+ wings.position.z=.03;
+ kite.add(wings);
+
+ // Viền đen cánh
+ const borderShape=new THREE.Shape();
+ borderShape.moveTo(-9.5,0);
+ borderShape.quadraticCurveTo(-5.6,4.3,0,3.7);
+ borderShape.quadraticCurveTo(5.6,4.3,9.5,0);
+ borderShape.quadraticCurveTo(5.6,-3.5,0,-3.2);
+ borderShape.quadraticCurveTo(-5.6,-3.5,-9.5,0);
+ const hole=new THREE.Path();
+ hole.moveTo(-8.8,0);
+ hole.quadraticCurveTo(-5.2,3.6,0,3.1);
+ hole.quadraticCurveTo(5.2,3.6,8.8,0);
+ hole.quadraticCurveTo(5.2,-2.9,0,-2.6);
+ hole.quadraticCurveTo(-5.2,-2.9,-8.8,0);
+ borderShape.holes.push(hole);
+ const borderGeo=new THREE.ShapeGeometry(borderShape);
+ const border=new THREE.Mesh(borderGeo,black);
+ border.position.z=.025;
+ kite.add(border);
+
+ // Điểm nhấn vàng ở hai đầu cánh
+ for(let side of [-1,1]){
+  const tip=new THREE.Mesh(new THREE.CircleGeometry(1.35,28),accent);
+  tip.position.set(side*7.6,0.15,.12);
+  kite.add(tip);
+  const blackTip=new THREE.Mesh(new THREE.CircleGeometry(0.75,20),black);
+  blackTip.position.set(side*7.6,0.15,.14);
+  kite.add(blackTip);
+  // Họa tiết nhỏ
+  const deco=new THREE.Mesh(new THREE.CircleGeometry(0.35,16),yellow);
+  deco.position.set(side*7.6,0.15,.16);
+  kite.add(deco);
+ }
+
+ // Logo kiểu LV / hình học ở giữa
+ const logoGroup=new THREE.Group();
+ logoGroup.position.z=.16;
+ const logoMat=new THREE.MeshBasicMaterial({color:0x111111});
+ // Chữ L
+ const l1=new THREE.Mesh(new THREE.PlaneGeometry(0.22,1.6),logoMat);
+ l1.position.set(-0.55,0,0);
+ logoGroup.add(l1);
+ const l2=new THREE.Mesh(new THREE.PlaneGeometry(0.9,0.22),logoMat);
+ l2.position.set(-0.15,-0.7,0);
+ logoGroup.add(l2);
+ // Chữ V
+ const v1=new THREE.Mesh(new THREE.PlaneGeometry(0.22,1.7),logoMat);
+ v1.position.set(0.35,0.1,0);
+ v1.rotation.z=0.45;
+ logoGroup.add(v1);
+ const v2=new THREE.Mesh(new THREE.PlaneGeometry(0.22,1.7),logoMat);
+ v2.position.set(0.95,0.1,0);
+ v2.rotation.z=-0.45;
+ logoGroup.add(v2);
+ kite.add(logoGroup);
+
+ // Phần diều nhỏ phía dưới (giống hình)
+ const lower=new THREE.Group();
+ lower.position.set(0,-5.8,.05);
+ const lowerShape=new THREE.Shape();
+ lowerShape.moveTo(0,1.8);
+ lowerShape.lineTo(2.8,-1.2);
+ lowerShape.lineTo(0,-3.2);
+ lowerShape.lineTo(-2.8,-1.2);
+ lowerShape.lineTo(0,1.8);
+ const lowerGeo=new THREE.ShapeGeometry(lowerShape);
+ const lowerMesh=new THREE.Mesh(lowerGeo,red);
+ lower.add(lowerMesh);
+ const lowerCenter=new THREE.Mesh(new THREE.CircleGeometry(0.7,24),yellow);
+ lowerCenter.position.z=.05;
+ lower.add(lowerCenter);
+ const lowerBlack=new THREE.Mesh(new THREE.CircleGeometry(0.35,16),black);
+ lowerBlack.position.z=.07;
+ lower.add(lowerBlack);
+ kite.add(lower);
+ kite.userData.lower=lower;
+
+ addTailAndStars();
+}
+
+function createSaoKite(){
+ clearKite();
+ const mat=new THREE.MeshStandardMaterial({color:0xffaa00,side:THREE.DoubleSide});
+ kiteMats.push(mat);
+ const geo=new THREE.CircleGeometry(4,6);
  const mesh=new THREE.Mesh(geo,mat);
- mesh.castShadow=true;
  kite.add(mesh);
- return mesh;
+ addTailAndStars();
 }
 
-triangle([0,0,.05],[-3.8,-4.8,.05],[0,-7,.05],kiteMats[0]);
-triangle([0,0,.05],[0,-7,.05],[3.8,-4.8,.05],kiteMats[1]);
-triangle([0,0,.05],[0,4.8,.05],[-3.8,-4.8,.05],kiteMats[2]);
-triangle([0,0,.05],[3.8,-4.8,.05],[0,4.8,.05],kiteMats[3]);
-
-const carbonMat=new THREE.MeshStandardMaterial({
- color:0x252b31,metalness:.8,roughness:.24
-});
-
-function rod(a,b,material=carbonMat,radius=.055){
- const d=new THREE.Vector3().subVectors(b,a);
- const m=new THREE.Mesh(
-  new THREE.CylinderGeometry(radius,radius,d.length(),10),
-  material
- );
- m.position.copy(a).add(b).multiplyScalar(.5);
- m.quaternion.setFromUnitVectors(
-  new THREE.Vector3(0,1,0),d.normalize()
- );
- kite.add(m);
- return m;
+function addTailAndStars(){
+ const stars=new THREE.Group();
+ kite.add(stars);
+ const tail=new THREE.Group();
+ kite.add(tail);
+ const colors=[0xff3333,0xffdd00,0x33ccff,0xff66aa,0xcc66ff];
+ for(let i=0;i<14;i++){ // đuôi dài và đẹp hơn
+  const m=new THREE.Mesh(
+   new THREE.BoxGeometry(.7,.9,.08),
+   new THREE.MeshStandardMaterial({color:colors[i%5],emissive:colors[i%5],emissiveIntensity:0.12})
+  );
+  m.position.set(Math.sin(i*.5)*.4,-8.5-i*1.15,.1);
+  m.rotation.z=Math.sin(i)*0.2;
+  tail.add(m);
+ }
+ kite.userData.tail=tail;
+ kite.userData.stars=stars;
 }
 
-rod(new THREE.Vector3(0,-7,.1),new THREE.Vector3(0,4.8,.1));
-rod(new THREE.Vector3(-3.8,-4.8,.1),new THREE.Vector3(3.8,-4.8,.1));
+function rebuildKite(type){
+ currentKiteType=type;
+ if(type==="wide") createWideKite();
+ else if(type==="sao") createSaoKite();
+ else createBasicKite();
+}
 
-const stars=new THREE.Group();
-kite.add(stars);
+rebuildKite("basic");
 
 function addDecoration(){
  if(money<100){toast("Không đủ tiền!");return}
  money-=100;
-
  const star=new THREE.Mesh(
   new THREE.SphereGeometry(.35,12,10),
-  new THREE.MeshStandardMaterial({
-   color:0xffe33b,emissive:0x553300
-  })
+  new THREE.MeshStandardMaterial({color:0xffe33b,emissive:0x553300})
  );
  star.position.set((Math.random()-.5)*4,Math.random()*5,.3);
- stars.add(star);
+ if(kite.userData.stars) kite.userData.stars.add(star);
  updateUI();
 }
-
-const tail=new THREE.Group();
-kite.add(tail);
-
-function createTail(){
- const colors=[0xffd43b,0x39c9ff,0xff78a5,0x9c77ff];
- for(let i=0;i<10;i++){
-  const m=new THREE.Mesh(
-   new THREE.BoxGeometry(.65,.8,.12),
-   new THREE.MeshStandardMaterial({color:colors[i%4]})
-  );
-  m.position.set(Math.sin(i*.6)*.35,-8-i*1.3,.1);
-  tail.add(m);
- }
-}
-createTail();
-
-scene.add(kite);
-kite.visible=false;
 
 //==================================================
 // STRING
 //==================================================
 
-// buffer cấp phát 1 lần, cập nhật mỗi khung hình (không tạo geometry mới)
 const stringPts=new Float32Array(51*3);
 const stringGeo=new THREE.BufferGeometry();
 stringGeo.setAttribute("position",new THREE.BufferAttribute(stringPts,3));
 
 const stringLine=new THREE.Line(
  stringGeo,
- new THREE.LineBasicMaterial({
-  color:0xffffff,transparent:true,opacity:.9
- })
+ new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:.9})
 );
 stringLine.frustumCulled=false;
 scene.add(stringLine);
@@ -678,38 +906,37 @@ scene.add(stringLine);
 function updateString(){
  stringLine.visible=kite.visible;
  if(!kite.visible)return;
-
  const hand=new THREE.Vector3(
   player.root.position.x+.48,
   2.7,
   player.root.position.z-.25
  );
-
- // [SỬA] dây càng căng thì càng ít võng (trước đây ngược lại)
- const sag=3*(1-tension/100);
-
+ // Vật lý dây: thả dài / ít căng → võng nhiều; bay cao / căng → dây thẳng
+ const lengthFactor=clamp(lineLength/60,0.4,2.2);
+ const tensionFactor=clamp(1-tension/85,0.05,1);
+ const sag=5.5 * lengthFactor * tensionFactor * (1 + height/80 * 0.3);
  const kp=kite.position;
  for(let i=0;i<=50;i++){
   const t=i/50;
+  const sagCurve=Math.sin(t*Math.PI) * sag;
   stringPts[i*3]=hand.x+(kp.x-hand.x)*t;
-  stringPts[i*3+1]=hand.y+(kp.y-hand.y)*t-Math.sin(t*Math.PI)*sag;
+  stringPts[i*3+1]=hand.y+(kp.y-hand.y)*t - sagCurve;
   stringPts[i*3+2]=hand.z+(kp.z-hand.z)*t;
  }
  stringGeo.attributes.position.needsUpdate=true;
 }
 
 //==================================================
-// GAME STATE
+// GAME STATE & ITEMS
 //==================================================
 
-let money=500;
+let money=800;
 let height=0,distance=0,record=0;
 let wind=8,windAngle=0,gust=0;
 let tension=0,lineLength=35;
 let state="walking";
 let cameraMode=0;
 let weatherIndex=0;
-let kiteLevel=0,ropeLevel=0,stabilityLevel=0;
 let kiteVelocity=new THREE.Vector3();
 let keys={};
 let reelHeld=false;
@@ -718,133 +945,320 @@ let last=performance.now();
 let clock=0;
 let playerRetreat=0;
 let steer=0;
+let durability=100;
+let stringBroken=false;
+let kiteBroken=false;
 
 const weather=[
- {name:"Nắng đẹp",wind:8,lift:1},
- {name:"Gió nhẹ",wind:4,lift:.65},
- {name:"Gió vừa",wind:13,lift:1.15},
- {name:"Gió mạnh",wind:19,lift:1.3},
- {name:"Gió giật",wind:23,lift:.85},
- {name:"Mưa nhẹ",wind:9,lift:.8}
+ {name:"Nắng đẹp",wind:8,lift:1,sky:0x86cafa,fog:0x9bcdf0},
+ {name:"Gió nhẹ",wind:4,lift:.65,sky:0x8fd0ff,fog:0xa0d5f0},
+ {name:"Gió vừa",wind:13,lift:1.15,sky:0x70b0e0,fog:0x80c0e0},
+ {name:"Gió mạnh",wind:19,lift:1.3,sky:0x5a90c0,fog:0x6aa0c0},
+ {name:"Gió giật",wind:23,lift:.85,sky:0x4a80b0,fog:0x5a90b0},
+ {name:"Mưa nhẹ",wind:9,lift:.8,sky:0x6a8aaa,fog:0x7a9aaa},
+ {name:"Bão",wind:38,lift:1.6,sky:0x3a4a5a,fog:0x4a5a6a},
+ {name:"Giông",wind:32,lift:1.45,sky:0x4a3a5a,fog:0x5a4a6a}
 ];
 
 const stateNames={
  walking:"Đi bộ",holding:"Cầm diều",running:"Chạy lấy đà",
- flying:"Đang bay",fallen:"Diều rơi"
+ flying:"Đang bay",fallen:"Diều rơi",broken:"Đã gãy/đứt"
 };
 
-function updateUI(){
- $("money").textContent=Math.floor(money);
- $("shopMoney").textContent=Math.floor(money);
- $("alt").textContent=Math.floor(height);
- $("dist").textContent=Math.floor(distance);
- $("record").textContent=Math.floor(record);
- $("wind").textContent=Math.floor(wind);
- $("rope").textContent=Math.floor(lineLength);
- $("tension").textContent=Math.floor(tension);
- $("weather").textContent=weather[weatherIndex].name;
- $("status").textContent=stateNames[state]||state;
- $("carbon").textContent=carbonLevel().name;
+// Items catalog
+const itemCatalog=[
+ // Kites
+ {id:"kite_basic",type:"kite",name:"Diều Cơ Bản",price:0,emoji:"🪁",shape:"basic",lift:1,durability:80,owned:true},
+ {id:"kite_wide",type:"kite",name:"Diều Cánh Rộng LV",price:1200,emoji:"🦋",shape:"wide",lift:1.25,durability:70,owned:false},
+ {id:"kite_sao",type:"kite",name:"Diều Sáo Truyền Thống",price:800,emoji:"🎵",shape:"sao",lift:1.1,durability:90,owned:false},
+ {id:"kite_dragon",type:"kite",name:"Diều Rồng",price:2500,emoji:"🐉",shape:"basic",lift:1.4,durability:65,owned:false},
+ // Carbons
+ {id:"carbon_t300",type:"carbon",name:"Carbon T300",price:150,emoji:"⚫",durability:60,strength:1,owned:true},
+ {id:"carbon_t700",type:"carbon",name:"Carbon T700",price:600,emoji:"🪶",durability:85,strength:1.3,owned:false},
+ {id:"carbon_t800",type:"carbon",name:"Carbon T800",price:1800,emoji:"💎",durability:95,strength:1.5,owned:false},
+ {id:"carbon_t1000",type:"carbon",name:"Carbon T1000",price:4000,emoji:"🌟",durability:100,strength:1.7,owned:false},
+ // Strings
+ {id:"string_nylon",type:"string",name:"Dây Nylon",price:50,emoji:"🧵",strength:40,maxLength:80,owned:true},
+ {id:"string_poly",type:"string",name:"Dây Polyester",price:200,emoji:"🧵",strength:60,maxLength:100,owned:false},
+ {id:"string_dyneema",type:"string",name:"Dây Dyneema",price:800,emoji:"💪",strength:90,maxLength:150,owned:false},
+ {id:"string_spectra",type:"string",name:"Dây Spectra",price:1500,emoji:"⚡",strength:100,maxLength:180,owned:false}
+];
+
+let inventory=[];
+let equipped={
+ kite: itemCatalog.find(i=>i.id==="kite_basic"),
+ carbon: itemCatalog.find(i=>i.id==="carbon_t300"),
+ string: itemCatalog.find(i=>i.id==="string_nylon")
+};
+
+// Initialize inventory with owned
+itemCatalog.forEach(item=>{
+ if(item.owned) inventory.push({...item, count:1});
+});
+
+function getEquippedStats(){
+ return {
+  kiteLift: equipped.kite ? equipped.kite.lift : 1,
+  kiteDur: equipped.kite ? equipped.kite.durability : 50,
+  carbonDur: equipped.carbon ? equipped.carbon.durability : 50,
+  carbonStr: equipped.carbon ? equipped.carbon.strength : 1,
+  stringStr: equipped.string ? equipped.string.strength : 30,
+  maxLine: equipped.string ? equipped.string.maxLength : 60
+ };
 }
 
-function msg(s){$("message").textContent=s}
+function updateUI(){
+ const set=(id,val)=>{const el=$(id); if(el) el.textContent=val;};
+ set("money",Math.floor(money));
+ set("shopMoney",Math.floor(money));
+ set("alt",Math.floor(height));
+ set("dist",Math.floor(distance));
+ set("record",Math.floor(record));
+ set("wind",Math.floor(wind));
+ set("rope",Math.floor(lineLength));
+ set("tension",Math.floor(tension));
+ set("weather",weather[weatherIndex].name);
+ set("status",stateNames[state]||state);
+ set("carbon",equipped.carbon ? equipped.carbon.name : "Không");
+ set("kiteName",equipped.kite ? equipped.kite.name : "Không");
+ set("durability",Math.floor(durability));
+}
+
+let codeMode=""; // "save" or "load"
+
+function openCodeModal(mode){
+ codeMode=mode;
+ const title=$("codeTitle");
+ if(title) title.textContent=mode==="save"?"💾 Nhập mã để lưu":"📂 Nhập mã để tải";
+ $("codeInput").value="";
+ $("codeModal").style.display="grid";
+ $("codeInput").focus();
+}
+function closeCodeModal(){
+ $("codeModal").style.display="none";
+}
+function confirmCode(){
+ const code=$("codeInput").value.trim();
+ if(!code){toast("Vui lòng nhập mã!");return}
+ closeCodeModal();
+ if(codeMode==="save") doSave(code);
+ else doLoad(code);
+}
+
+// Safe storage (works even if localStorage is blocked)
+const memoryStore={};
+const safeStorage={
+ getItem(key){
+  try{ return localStorage.getItem(key); }catch(e){ return memoryStore[key]||null; }
+ },
+ setItem(key,val){
+  try{ localStorage.setItem(key,val); }catch(e){ memoryStore[key]=val; }
+ }
+};
+
+function doSave(code){
+ try{
+  const data={
+   money,record,inventory,equippedIds:{
+    kite:equipped.kite?.id,
+    carbon:equipped.carbon?.id,
+    string:equipped.string?.id
+   },lastRewardDay,code
+  };
+  safeStorage.setItem("kiteSave_"+code,JSON.stringify(data));
+  toast("Đã lưu với mã: "+code);
+ }catch(e){toast("Lỗi lưu!");}
+}
+
+function doLoad(code){
+ try{
+  const raw=safeStorage.getItem("kiteSave_"+code);
+  if(!raw){toast("Không tìm thấy mã này!");return}
+  const data=JSON.parse(raw);
+  if(data.money!=null) money=data.money;
+  if(data.record!=null) record=data.record;
+  if(data.inventory) inventory=data.inventory;
+  if(data.equippedIds){
+   if(data.equippedIds.kite) equipped.kite=itemCatalog.find(i=>i.id===data.equippedIds.kite)||equipped.kite;
+   if(data.equippedIds.carbon) equipped.carbon=itemCatalog.find(i=>i.id===data.equippedIds.carbon)||equipped.carbon;
+   if(data.equippedIds.string) equipped.string=itemCatalog.find(i=>i.id===data.equippedIds.string)||equipped.string;
+  }
+  if(data.lastRewardDay) lastRewardDay=data.lastRewardDay;
+  if(equipped.kite) rebuildKite(equipped.kite.shape);
+  updateUI();
+  toast("Đã tải game từ mã: "+code);
+ }catch(e){toast("Lỗi tải!");}
+}
+
+function saveGameWithCode(){openCodeModal("save")}
+function loadGameWithCode(){openCodeModal("load")}
+
+// Giữ hàm cũ
+function saveGame(){}
+function loadGame(){}
+
+//==================================================
+// SOUND SYSTEM (Web Audio API)
+//==================================================
+let audioCtx=null;
+let soundEnabled=true;
+let bgGain=null;
+let bgOsc=null;
+
+function initAudio(){
+ if(audioCtx) return;
+ try{
+  audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+ }catch(e){soundEnabled=false}
+}
+
+function playTone(freq,duration=0.15,type="sine",vol=0.15){
+ if(!soundEnabled||!audioCtx) return;
+ try{
+  const osc=audioCtx.createOscillator();
+  const gain=audioCtx.createGain();
+  osc.type=type;
+  osc.frequency.setValueAtTime(freq,audioCtx.currentTime);
+  gain.gain.setValueAtTime(vol,audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+duration);
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start();
+  osc.stop(audioCtx.currentTime+duration);
+ }catch(e){}
+}
+
+function playClick(){playTone(800,0.08,"square",0.08)}
+function playThrow(){playTone(520,0.2,"sawtooth",0.12); setTimeout(()=>playTone(680,0.15,"sine",0.1),80)}
+function playRun(){playTone(220,0.1,"triangle",0.06)}
+function playMove(){if(Math.random()<0.3) playTone(180+Math.random()*40,0.05,"sine",0.04)}
+function playBuy(){playTone(660,0.12,"sine",0.1); setTimeout(()=>playTone(880,0.15,"sine",0.1),100)}
+function playBreak(){playTone(120,0.4,"sawtooth",0.18); setTimeout(()=>playTone(80,0.5,"square",0.12),150)}
+function playSuccess(){playTone(523,0.1,"sine",0.1); setTimeout(()=>playTone(659,0.1,"sine",0.1),90); setTimeout(()=>playTone(784,0.15,"sine",0.1),180)}
+
+function startBgMusic(){
+ if(!soundEnabled||!audioCtx||bgOsc) return;
+ try{
+  bgOsc=audioCtx.createOscillator();
+  bgGain=audioCtx.createGain();
+  bgOsc.type="sine";
+  bgOsc.frequency.setValueAtTime(196,audioCtx.currentTime); // G3 ambient
+  bgGain.gain.setValueAtTime(0.04,audioCtx.currentTime);
+  bgOsc.connect(bgGain);
+  bgGain.connect(audioCtx.destination);
+  bgOsc.start();
+  // simple melody loop
+  let step=0;
+  const notes=[196,220,247,220,196,165,196,220];
+  setInterval(()=>{
+   if(!soundEnabled||!bgOsc) return;
+   bgOsc.frequency.setValueAtTime(notes[step%notes.length],audioCtx.currentTime);
+   step++;
+  },800);
+ }catch(e){}
+}
+
+function stopBgMusic(){
+ if(bgOsc){try{bgOsc.stop()}catch(e){} bgOsc=null}
+}
+
+function toggleSound(){
+ soundEnabled=!soundEnabled;
+ const btn=$("soundBtn");
+ if(btn) btn.textContent=soundEnabled?"🔊 ÂM THANH":"🔇 TẮT ÂM";
+ if(soundEnabled){
+  initAudio();
+  startBgMusic();
+  playClick();
+ }else{
+  stopBgMusic();
+ }
+ toast(soundEnabled?"Đã bật âm thanh":"Đã tắt âm thanh");
+}
+
+//==================================================
+// TUTORIAL
+//==================================================
+function showTutorial(){
+ const el=$("tutorial");
+ if(el) el.style.display="grid";
+ playClick();
+}
+function closeTutorial(){
+ const el=$("tutorial");
+ if(el) el.style.display="none";
+ playClick();
+}
+
+// Show tutorial on first visit
+try{
+ if(!safeStorage.getItem("kiteTutorialSeen")){
+  setTimeout(()=>{showTutorial(); safeStorage.setItem("kiteTutorialSeen","1")},800);
+ }
+}catch(e){
+ setTimeout(showTutorial,800);
+}
+
+function msg(s){const el=$("message"); if(el) el.textContent=s}
 
 let toastTimer=0;
 function toast(s){
- $("toast").textContent=s;
- $("toast").style.display="block";
- clearTimeout(toastTimer); // [SỬA] tránh toast cũ tắt sớm toast mới
- toastTimer=setTimeout(()=>$("toast").style.display="none",1800);
-}
-
-function carbonLevel(){
- const owned=carbonItems.filter(x=>x.owned);
- return owned.length?owned[owned.length-1]:carbonItems[0];
+ const el=$("toast");
+ if(!el) return;
+ el.textContent=s;
+ el.style.display="block";
+ clearTimeout(toastTimer);
+ toastTimer=setTimeout(()=>el.style.display="none",1800);
 }
 
 //==================================================
-// CARBON SHOP
+// SHOP
 //==================================================
-
-const carbonItems=[
- {name:"Carbon Basic",price:100,rarity:"Common",stock:5,owned:true,
-  emoji:"⚫",level:1},
- {name:"Carbon Pro",price:500,rarity:"Rare",stock:4,owned:false,
-  emoji:"🪶",level:2},
- {name:"Carbon Ultra",price:2000,rarity:"Epic",stock:3,owned:false,
-  emoji:"💎",level:3},
- {name:"Carbon Master",price:5000,rarity:"Legendary",stock:2,owned:false,
-  emoji:"🌟",level:4},
- {name:"Carbon Prismatic",price:10000,rarity:"Prismatic",stock:1,owned:false,
-  emoji:"🌈",level:5}
-];
 
 let restockSeconds=240;
 let lastRewardDay=-1;
 
+let shopTab="kite";
+
+function setShopTab(tab){
+ shopTab=tab;
+ renderShop();
+}
+
 function renderShop(){
  const container=$("shopItems");
  container.innerHTML="";
-
- carbonItems.forEach((item,index)=>{
+ itemCatalog.forEach((item,index)=>{
+  if(item.price===0) return;
+  if(item.type!==shopTab) return;
   const div=document.createElement("div");
   div.className="item";
-
   const icon=document.createElement("div");
   icon.className="itemIcon";
   icon.textContent=item.emoji;
-
   const info=document.createElement("div");
   info.className="itemInfo";
-
   const title=document.createElement("h3");
   title.textContent=item.name;
-
-  const stock=document.createElement("p");
-  stock.textContent="x"+item.stock+" Stock";
-
-  const rarity=document.createElement("span");
-  rarity.className="rarity";
-  rarity.textContent=item.rarity;
-
+  const desc=document.createElement("p");
+  desc.textContent=`Độ bền/Sức mạnh: ${item.durability||item.strength||'N/A'}`;
   const button=document.createElement("button");
-
-  // [SỬA] kiểm tra OWNED trước, để món đã mua không hiện "NO STOCK"
-  if(item.owned){
-   button.textContent="OWNED";
-   button.disabled=true;
-   button.style.background="#777";
-  }else if(item.stock<=0){
-   button.textContent="NO STOCK";
-   button.disabled=true;
-   button.style.background="#777";
-  }else{
-   button.textContent="BUY - "+item.price+" xu";
-   button.onclick=()=>buyCarbon(index);
-  }
-
-  info.append(title,stock,rarity,button);
+  button.textContent="MUA - "+item.price+" xu";
+  button.onclick=()=>buyItem(index);
+  info.append(title,desc,button);
   div.append(icon,info);
   container.appendChild(div);
  });
+ if(container.innerHTML==="") container.innerHTML="<p style='text-align:center;padding:20px'>Không có món nào trong mục này.</p>";
 }
 
-function buyCarbon(index){
- const item=carbonItems[index];
-
- if(item.owned){toast("Bạn đã sở hữu món này!");return}
- if(item.stock<=0){toast("Hết hàng!");return}
+function buyItem(index){
+ const item=itemCatalog[index];
  if(money<item.price){toast("Không đủ tiền!");return}
-
  money-=item.price;
- item.stock--;
- item.owned=true;
-
- kiteLevel+=item.level*.5;
- stabilityLevel+=item.level*.4;
- ropeLevel+=item.level*.5;
-
- toast("Đã mua "+item.name+"!");
+ inventory.push({...item, count:1});
+ toast("Đã mua "+item.name+"! Vào Balo để trang bị.");
+ saveGame();
  renderShop();
  updateUI();
 }
@@ -860,11 +1274,7 @@ function restock(manual){
   if(money<150){toast("Cần 150 xu để nhập hàng!");return}
   money-=150;
  }
- carbonItems.forEach((item,i)=>{
-  item.stock=[5,4,3,2,1][i];
- });
  restockSeconds=240;
- renderShop();
  updateUI();
  if(manual)toast("Đã nhập hàng mới!");
 }
@@ -877,13 +1287,8 @@ function updateRestock(dt){
  }
  const m=Math.floor(restockSeconds/60);
  const s=Math.floor(restockSeconds%60);
- $("restockTimer").textContent=
-  "New stock in "+m+"m "+s+"s";
+ const rt=$("restockTimer"); if(rt) rt.textContent="New stock in "+m+"m "+s+"s";
 }
-
-//==================================================
-// DAILY REWARD
-//==================================================
 
 function dailyReward(){
  const day=Math.floor(Date.now()/86400000);
@@ -895,7 +1300,112 @@ function dailyReward(){
  money+=300;
  updateUI();
  toast("🎁 Nhận được 300 xu!");
+ saveGame();
 }
+
+//==================================================
+// BACKPACK & EQUIP
+//==================================================
+
+function renderBackpack(){
+ const container=$("backpackItems");
+ container.innerHTML="";
+ if(inventory.length===0){
+  container.innerHTML="<p>Balo trống!</p>";
+  return;
+ }
+ inventory.forEach((item,idx)=>{
+  const div=document.createElement("div");
+  div.className="item";
+  const icon=document.createElement("div");
+  icon.className="itemIcon";
+  icon.textContent=item.emoji;
+  const info=document.createElement("div");
+  info.className="itemInfo";
+  const title=document.createElement("h3");
+  title.textContent=item.name;
+  const desc=document.createElement("p");
+  desc.textContent=`Loại: ${item.type}`;
+  const btn=document.createElement("button");
+  btn.textContent="TRANG BỊ";
+  btn.onclick=()=>equipItem(idx);
+  info.append(title,desc,btn);
+  div.append(icon,info);
+  container.appendChild(div);
+ });
+}
+
+function equipItem(idx){
+ const item=inventory[idx];
+ // Unequip old of same type
+ const old=equipped[item.type];
+ if(old && old.id !== item.id){
+  inventory.push({...old});
+ }
+ equipped[item.type]=item;
+ inventory.splice(idx,1);
+ if(item.type==="kite"){
+  rebuildKite(item.shape);
+ }
+ durability=Math.min(100, ((equipped.kite?.durability||50) + (equipped.carbon?.durability||50))/2 );
+ toast("Đã trang bị "+item.name+"!");
+ playSuccess();
+ saveGame();
+ renderBackpack();
+ updateUI();
+}
+
+function openBackpack(){
+ renderBackpack();
+ $("backpack").style.display="grid";
+}
+function closeBackpack(){$("backpack").style.display="none"}
+
+//==================================================
+// SELL ZONE
+//==================================================
+
+function renderSell(){
+ const container=$("sellItems");
+ container.innerHTML="";
+ inventory.forEach((item,idx)=>{
+  const div=document.createElement("div");
+  div.className="item";
+  const info=document.createElement("div");
+  info.className="itemInfo";
+  const title=document.createElement("h3");
+  title.textContent=item.name;
+  const btn=document.createElement("button");
+  const sellPrice=Math.floor(item.price*0.4);
+  btn.textContent="BÁN - "+sellPrice+" xu";
+  btn.onclick=()=>{
+   money+=sellPrice;
+   inventory.splice(idx,1);
+   toast("Đã bán "+item.name+"!");
+   renderSell();
+   updateUI();
+  };
+  info.append(title,btn);
+  div.append(info);
+  container.appendChild(div);
+ });
+ if(inventory.length===0) container.innerHTML="<p>Không có gì để bán!</p>";
+}
+
+function trySell(){
+ const distToStall=Math.hypot(player.root.position.x-70,player.root.position.z-20);
+ if(distToStall>8){
+  toast("Hãy đến gần khu bán đồng nát (phía phải map)!");
+  return;
+ }
+ openSell();
+}
+
+function openSell(){
+ renderSell();
+ $("sell").style.display="grid";
+}
+function closeSell(){$("sell").style.display="none"}
 
 //==================================================
 // CUSTOMIZATION
@@ -915,21 +1425,21 @@ function paintKite(color){
 
 function changeWeather(){
  weatherIndex=(weatherIndex+1)%weather.length;
- toast("Thời tiết: "+weather[weatherIndex].name);
+ const w=weather[weatherIndex];
+ scene.background.setHex(w.sky);
+ sky.material.color.setHex(w.sky);
+ scene.fog.color.setHex(w.fog);
+ toast("Thời tiết: "+w.name + (w.name==="Bão"||w.name==="Giông"?" - Diều bay nhanh hơn!":""));
 }
 
 function changeCamera(){
  cameraMode=(cameraMode+1)%5;
- const names=[
-  "Theo diều","Theo nhân vật",
-  "Điện ảnh","First Person","Toàn cảnh"
- ];
+ const names=["Theo diều","Theo nhân vật","Điện ảnh","First Person","Toàn cảnh"];
  toast("Camera: "+names[cameraMode]);
 }
 
 function toggleGraphics(){
  quality=(quality+1)%3;
- // Ultra cần composer; nếu không tải được thì bỏ qua mức này
  if(quality===2&&!composer)quality=0;
  applyQuality();
  toast("Đồ họa: "+QUALITY_NAMES[quality]);
@@ -941,6 +1451,7 @@ function toggleGraphics(){
 
 function bindMove(id,key){
  const b=$(id);
+ if(!b) return; // tránh lỗi nếu phần tử không tồn tại
  b.addEventListener("pointerdown",e=>{
   e.preventDefault();
   keys[key]=true;
@@ -950,13 +1461,63 @@ function bindMove(id,key){
  });
 }
 
-bindMove("moveUp","forward");
-bindMove("moveDown","back");
-bindMove("moveLeft","left");
-bindMove("moveRight","right");
+// Không còn dùng nút cũ nữa
+// bindMove("moveUp","forward");
+// bindMove("moveDown","back");
+// bindMove("moveLeft","left");
+// bindMove("moveRight","right");
+
+// === JOYSTICK ===
+let joyX=0, joyY=0;
+const joystick=$("joystick");
+const stick=$("stick");
+if(joystick && stick){
+let joyActive=false;
+let joyCenter={x:0,y:0};
+
+function getJoyPos(e){
+ const rect=joystick.getBoundingClientRect();
+ const x=(e.clientX||e.touches[0].clientX)-rect.left-60;
+ const y=(e.clientY||e.touches[0].clientY)-rect.top-60;
+ const dist=Math.hypot(x,y);
+ const max=45;
+ if(dist>max){
+  const scale=max/dist;
+  return {x:x*scale, y:y*scale};
+ }
+ return {x,y};
+}
+
+joystick.addEventListener("pointerdown",e=>{
+ e.preventDefault();
+ joyActive=true;
+ const pos=getJoyPos(e);
+ stick.style.transform=`translate(${pos.x}px,${pos.y}px)`;
+ joyX=pos.x/45;
+ joyY=-pos.y/45;
+});
+["pointermove"].forEach(ev=>{
+ joystick.addEventListener(ev,e=>{
+  if(!joyActive)return;
+  e.preventDefault();
+  const pos=getJoyPos(e);
+  stick.style.transform=`translate(${pos.x}px,${pos.y}px)`;
+  joyX=pos.x/45;
+  joyY=-pos.y/45;
+ });
+});
+["pointerup","pointercancel","pointerleave"].forEach(ev=>{
+ joystick.addEventListener(ev,()=>{
+  joyActive=false;
+  stick.style.transform="translate(0,0)";
+  joyX=0; joyY=0;
+ });
+});
+}
 
 function bindHold(id,callback){
  const b=$(id);
+ if(!b) return;
  b.addEventListener("pointerdown",e=>{
   e.preventDefault();callback(true);
  });
@@ -999,232 +1560,263 @@ addEventListener("keyup",e=>{
  if(k==="f")keys.release=false;
 });
 
+// Xoay camera bằng chuột khi đang bay
+let isDragging=false;
+addEventListener("pointerdown",e=>{
+ if(cameraMode===3 && state==="flying") isDragging=true;
+});
+addEventListener("pointerup",()=>isDragging=false);
+addEventListener("pointermove",e=>{
+ if(!isDragging || cameraMode!==3) return;
+ cameraYaw -= e.movementX * 0.004;
+ cameraPitch = clamp(cameraPitch - e.movementY * 0.003, -0.6, 0.8);
+});
+
 //==================================================
 // LAUNCH
 //==================================================
 
 function mainAction(){
- if(state==="walking"||state==="fallen"){
-  if(Math.abs(player.root.position.x)>40||
-     player.root.position.z>35){
+ initAudio();
+ playClick();
+ if(state==="walking"||state==="fallen"||state==="broken"){
+  if(Math.abs(player.root.position.x)>40||player.root.position.z>35){
    msg("Hãy đi đến bãi cỏ rộng!");
    return;
   }
-
   state="holding";
   kite.visible=true;
-  kite.position.set(
-   player.root.position.x+1,
-   3.8,
-   player.root.position.z-1
-  );
-  $("action").textContent="🏃 CHẠY & NÉM";
+  stringBroken=false;
+  kiteBroken=false;
+  durability=100;
+  kite.position.set(player.root.position.x+1,3.8,player.root.position.z-1);
+  const act=$("action"); if(act) act.textContent="🏃 CHẠY & NÉM";
   msg("Bạn đang cầm diều! Bấm tiếp để chạy lấy đà.");
   return;
  }
-
  if(state==="holding"){
   state="running";
   flightTime=0;
-  $("action").textContent="ĐANG CHẠY";
+  playRun();
+  const act=$("action"); if(act) act.textContent="ĐANG CHẠY";
   msg("Đang chạy lấy đà!");
  }
 }
 
 function finishThrow(){
  state="flying";
- // [SỬA] ném theo hướng ngược gió (-z) và lên cao hơn
- kiteVelocity.set(0,6,-4);
+ playThrow();
+ kiteVelocity.set(0,12,-6);
  flightTime=0;
  playerRetreat=0;
  tension=0;
+ cameraMode=3; // tự chuyển góc nhìn thứ nhất nhìn vào diều
  $("flight").style.display="flex";
  $("action").style.display="none";
- msg("Diều đã bay! Hãy điều khiển và quản lý dây.");
+ msg("Diều đã bay! Góc nhìn thứ nhất – dùng chuột hoặc Q/E để xoay camera.");
 }
 
 //==================================================
 // CAMERA
 //==================================================
 
+let cameraYaw=0;
+let cameraPitch=0.15;
 const cameraTarget=new THREE.Vector3();
 const cameraPosition=new THREE.Vector3();
 
 function updateCamera(dt){
  const hasKite=kite.visible;
- // [SỬA] chế độ 0 khi chưa có diều từng rơi vào nhánh "Toàn cảnh"
  const target=hasKite?kite.position:player.root.position;
  const smooth=1-Math.exp(-dt*3.5);
-
  if(cameraMode===0){
   cameraTarget.copy(target);
   if(!hasKite)cameraTarget.y+=2;
-  cameraPosition.set(
-   target.x+10,
-   target.y+(hasKite?7:8),
-   target.z+(hasKite?19:15)
-  );
+  cameraPosition.set(target.x+10,target.y+(hasKite?7:8),target.z+(hasKite?19:15));
  }else if(cameraMode===1){
   cameraTarget.copy(player.root.position);
   cameraTarget.y+=2;
-  cameraPosition.set(
-   player.root.position.x+8,8,
-   player.root.position.z+15
-  );
+  cameraPosition.set(player.root.position.x+8,8,player.root.position.z+15);
  }else if(cameraMode===2){
   cameraTarget.copy(target);
   if(!hasKite)cameraTarget.y+=2;
-  cameraPosition.set(
-   target.x+Math.sin(clock*.3)*19,
-   target.y+8,
-   target.z+Math.cos(clock*.3)*19
-  );
+  cameraPosition.set(target.x+Math.sin(clock*.3)*19,target.y+8,target.z+Math.cos(clock*.3)*19);
  }else if(cameraMode===3){
-  cameraTarget.copy(player.root.position);
-  cameraTarget.y+=2.7;
-  cameraPosition.copy(cameraTarget);
-  cameraPosition.z-=.2;
-  if(hasKite)cameraTarget.lerp(kite.position,.3);
+  // Góc nhìn thứ nhất nhìn vào diều – camera đứng sau vai, không bị che
+  const hand=new THREE.Vector3(
+   player.root.position.x,
+   3.2,
+   player.root.position.z + 1.8
+  );
+  cameraPosition.copy(hand);
+  const dir=new THREE.Vector3(
+   Math.sin(cameraYaw)*Math.cos(cameraPitch),
+   Math.sin(cameraPitch),
+   -Math.cos(cameraYaw)*Math.cos(cameraPitch)
+  );
+  if(hasKite){
+   const toKite=kite.position.clone().sub(hand).normalize();
+   dir.lerp(toKite,0.75);
+  }
+  cameraTarget.copy(hand).addScaledVector(dir,20);
  }else{
   cameraTarget.copy(target);
   cameraPosition.set(target.x+25,target.y+20,target.z+35);
  }
-
  camera.position.lerp(cameraPosition,smooth);
  camera.lookAt(cameraTarget);
 }
 
 //==================================================
-// MAIN PHYSICS
+// MAIN PHYSICS + BREAK MECHANICS
 //==================================================
 
 let earned=0;
 let turbulence=0;
+let highTensionTime=0;
+let highWindTime=0;
 
 function physics(dt,now){
  if(state!=="flying")return;
-
  flightTime+=dt;
-
  const weatherData=weather[weatherIndex];
- // [SỬA] trước đây wind/10 (≈0.8) quá yếu nên diều luôn rơi ngay
- const windPower=wind*.45*weatherData.lift;
-
- const steering=
-  (keys.kiteRight?1:0)-(keys.kiteLeft?1:0);
-
+ const stats=getEquippedStats();
+ const windPower=wind*.55*weatherData.lift * stats.kiteLift; // gió mạnh hơn một chút
+ const steering=(keys.kiteRight?1:0)-(keys.kiteLeft?1:0);
  steer=steering;
-
  if(reelHeld)lineLength=Math.max(10,lineLength-8*dt);
- if(keys.release)lineLength=Math.min(
-  120+ropeLevel*35,lineLength+10*dt
- );
-
- // [SỬA] gió thổi về phía -z (ra xa người chơi) để diều bay lên khi dây căng
+ if(keys.release)lineLength=Math.min(stats.maxLine,lineLength+12*dt); // nhả dây nhanh hơn
  const windVector=new THREE.Vector3(
   Math.sin(windAngle)*windPower,
-  turbulence*.02,
+  turbulence*.015,
   -Math.cos(windAngle)*windPower
  );
-
  const relativeWind=windVector.clone().sub(kiteVelocity);
  const speed=relativeWind.length();
-
- // LIFT
- const liftForce=Math.min(
-  12,speed*speed*.35*(.7+kiteLevel*.08)
- );
-
- const lift=new THREE.Vector3(
-  relativeWind.x*.01,
-  1,
-  relativeWind.z*.01
- ).normalize().multiplyScalar(liftForce);
-
- // DRAG (kéo diều trôi theo gió)
- const drag=relativeWind.clone().multiplyScalar(
-  Math.min(.6,speed*.08)
- );
-
- // GRAVITY
- const gravity=new THREE.Vector3(0,-2.25,0);
-
- // STEERING
- const steeringForce=new THREE.Vector3(steering*5,0,0);
-
+ // Lift mạnh và ổn định hơn
+ const liftForce=Math.min(18,speed*speed*.42*(.85+stats.carbonStr*.12));
+ const lift=new THREE.Vector3(relativeWind.x*.008,1,relativeWind.z*.008).normalize().multiplyScalar(liftForce);
+ const drag=relativeWind.clone().multiplyScalar(Math.min(.45,speed*.06)); // drag nhẹ hơn
+ const gravity=new THREE.Vector3(0,-1.6,0); // trọng lực nhẹ hơn → dễ bay
+ const steeringForce=new THREE.Vector3(steering*6,0,0);
  kiteVelocity.addScaledVector(lift,dt);
  kiteVelocity.addScaledVector(drag,dt);
  kiteVelocity.addScaledVector(gravity,dt);
  kiteVelocity.addScaledVector(steeringForce,dt);
+ kiteVelocity.multiplyScalar(Math.pow(.988,dt*60)); // giảm damping
+ kiteVelocity.x=clamp(kiteVelocity.x,-14,14);
+ kiteVelocity.y=clamp(kiteVelocity.y,-5,12);
+ kiteVelocity.z=clamp(kiteVelocity.z,-14,9);
 
- kiteVelocity.multiplyScalar(Math.pow(.985,dt*60));
+ // === Lắc lư & di chuyển tự nhiên (không đứng yên) ===
+ const avgDur=(stats.kiteDur + stats.carbonDur)/2;
+ const instability=clamp((wind - 8) / 25 * (1.15 - avgDur/110), 0, 1.8);
+ // Sway nhẹ luôn có + mạnh hơn khi gió to / đồ yếu
+ const swayX=Math.sin(now*0.0018 + flightTime)*1.8 * (0.4 + instability);
+ const swayY=Math.sin(now*0.0025)*0.9 * (0.3 + instability*0.6);
+ const swayZ=Math.cos(now*0.0014)*1.2 * (0.3 + instability);
+ kiteVelocity.x += swayX * dt * 3.5;
+ kiteVelocity.y += swayY * dt * 2.2;
+ kiteVelocity.z += swayZ * dt * 2.8;
 
- kiteVelocity.x=clamp(kiteVelocity.x,-9,9);
- kiteVelocity.y=clamp(kiteVelocity.y,-5,8);
- kiteVelocity.z=clamp(kiteVelocity.z,-9,6);
+ // Khi đồ yếu + gió mạnh → thêm xoay vòng / bay lung tung
+ if(instability > 0.6){
+  const spinForce=instability * 4.5;
+  kiteVelocity.x += Math.sin(now*0.004 + flightTime*2) * spinForce * dt;
+  kiteVelocity.z += Math.cos(now*0.0035) * spinForce * dt * 0.8;
+ }
 
  kite.position.addScaledVector(kiteVelocity,dt);
-
- // ROPE TENSION
- const hand=new THREE.Vector3(
-  player.root.position.x+.48,
-  2.7,
-  player.root.position.z-.25
- );
-
+ // Tension
+ const hand=new THREE.Vector3(player.root.position.x+.48,2.7,player.root.position.z-.25);
  const diff=kite.position.clone().sub(hand);
  const actual=diff.length();
  const maxLength=lineLength*.94;
-
- tension=clamp((actual/maxLength-.68)*210,0,100);
-
+ tension=clamp((actual/maxLength-.55)*160,0,100); // tension dễ chịu hơn
  if(actual>maxLength){
   const dir=diff.normalize();
   kite.position.copy(hand.clone().addScaledVector(dir,maxLength));
   const outward=kiteVelocity.dot(dir);
   if(outward>0){
-   kiteVelocity.addScaledVector(
-    dir,-outward*(.82+stabilityLevel*.025)
-   );
+   kiteVelocity.addScaledVector(dir,-outward*(.7+stats.carbonStr*.03));
   }
  }
+ // Break checks – khó gãy hơn nhiều
+ if(tension>stats.stringStr + 25 && !stringBroken){ // ngưỡng cao hơn
+  highTensionTime+=dt;
+  if(highTensionTime>3.5){ // thời gian chịu lâu hơn
+   stringBroken=true;
+   breakEvent("Đứt dây! Bay quá căng mà không nhả dây kịp.");
+  }
+ }else highTensionTime=0;
+ const windStress=wind * (1.1 - stats.carbonDur/150);
+ if(windStress>42 && !kiteBroken){ // chịu gió tốt hơn
+  highWindTime+=dt;
+  if(highWindTime>4){
+   kiteBroken=true;
+   breakEvent("Gió quá mạnh làm diều cong và gãy! Cần carbon chắc hơn.");
+  }
+ }else highWindTime=0;
+ // Visual bend mạnh hơn – một nửa cong vào, nửa kia cũng cong theo
+ const bend=clamp((wind-8)/22 + tension/120,0,1.1);
+ const unstableRot=instability * 0.7;
+ kite.rotation.z=Math.sin(now*.0022)*.2 - kiteVelocity.x*.04 - steer*.12 + bend*0.7*(Math.sin(now*.015)) + Math.sin(now*0.005)*unstableRot;
+ kite.rotation.x=Math.sin(now*.0018)*.18 + bend*0.45 + Math.cos(now*0.004)*unstableRot*0.8;
+ kite.rotation.y=steer*.18 + Math.sin(now*.0012)*.22 + Math.sin(now*0.006)*unstableRot;
 
- // KITE ANIMATION
- kite.rotation.z=Math.sin(now*.002)*.1-
-  kiteVelocity.x*.025-steer*.08;
-
- kite.rotation.x=Math.sin(now*.0015)*.1;
- kite.rotation.y=steer*.12+Math.sin(now*.001)*.15;
-
- tail.rotation.z=Math.sin(now*.004)*.15;
-
+ // Cong hai nửa cánh (giả lập bằng scale + rotation lệch)
+ const leftBend=bend*0.55 + Math.sin(now*0.008)*0.15;
+ const rightBend=bend*0.55 + Math.cos(now*0.009)*0.15;
+ kite.scale.set(1 + bend*0.08, 1 - bend*0.06, 1);
+ // Áp dụng cong cho các mesh con nếu có
+ kite.children.forEach((child,i)=>{
+  if(child.isMesh && i<6){
+   child.rotation.x= (i%2===0 ? leftBend : rightBend) * 0.35;
+   child.position.z= Math.sin(leftBend)*0.15 * (i%2===0?1:-1);
+  }
+ });
+ if(kite.userData.lower){
+  kite.userData.lower.rotation.x=bend*0.6;
+  kite.userData.lower.rotation.z=Math.sin(now*0.01)*bend*0.2;
+ }
+ if(kite.userData.tail){
+  kite.userData.tail.rotation.z=Math.sin(now*.005)*.35 + instability*0.45;
+  kite.userData.tail.rotation.x=Math.sin(now*.003)*0.2 + bend*0.3;
+ }
  height=Math.max(0,kite.position.y);
  distance=Math.sqrt(
   Math.pow(kite.position.x-player.root.position.x,2)+
   Math.pow(kite.position.z-player.root.position.z,2)
  );
-
  record=Math.max(record,height);
-
  earned+=dt;
  if(earned>=1){
   earned=0;
-  money+=Math.max(1,Math.floor(
-   height*.055+distance*.02+windPower*.35
-  ));
+  money+=Math.max(1,Math.floor(height*.055+distance*.02+windPower*.35));
  }
-
- // [SỬA] có thời gian ân hạn sau khi ném, tránh rơi ngay lập tức
- if(flightTime>2&&height<=1.5){
+ if(flightTime>3&&height<=1.2 && !stringBroken && !kiteBroken){
   height=0;
   tension=0;
   state="fallen";
   kite.visible=false;
   $("flight").style.display="none";
   $("action").style.display="block";
-  $("action").textContent="🪁 NHẶT DIỀU";
+  const act=$("action"); if(act) act.textContent="🪁 NHẶT DIỀU";
   msg("Diều đã hạ xuống. Hãy nhặt lại!");
  }
+}
+
+function breakEvent(reason){
+ playBreak();
+ state="broken";
+ kite.visible=false;
+ stringLine.visible=false;
+ $("flight").style.display="none";
+ $("action").style.display="block";
+ const act=$("action"); if(act) act.textContent="🪁 NHẶT DIỀU";
+ msg(reason + " Hãy trang bị bộ chắc hơn từ Balo!");
+ toast(reason);
+ durability=0;
 }
 
 //==================================================
@@ -1234,17 +1826,14 @@ function physics(dt,now){
 let uiTimer=0;
 let gustTimer=0;
 let clockTime=12;
+let lightningTimer=0;
 
 function animate(now){
  requestAnimationFrame(animate);
-
  const dt=Math.min((now-last)/1000,.035);
  last=now;
  clock+=dt;
-
- // WEATHER
  const w=weather[weatherIndex];
-
  gustTimer-=dt;
  if(gustTimer<=0){
   gustTimer=2+Math.random()*3;
@@ -1254,101 +1843,93 @@ function animate(now){
  wind+=(w.wind-wind)*dt*.1;
  turbulence+=(gust-turbulence)*dt*1.5;
  gust*=Math.pow(.985,dt*60);
-
- // PLAYER
- // [SỬA] thêm "fallen" để người chơi còn đi lại được sau khi diều rơi
- if(["walking","holding","running","flying","fallen"].includes(state)){
-  const forward=(keys.forward?1:0)-(keys.back?1:0);
-  const side=(keys.right?1:0)-(keys.left?1:0);
+ // Lightning for storm
+ if(w.name==="Bão"||w.name==="Giông"){
+  lightningTimer-=dt;
+  if(lightningTimer<=0){
+   lightningTimer=3+Math.random()*5;
+   scene.background.setHex(0xffffff);
+   setTimeout(()=>scene.background.setHex(w.sky),100);
+  }
+ }
+ // Player
+ if(["walking","holding","running","flying","fallen","broken"].includes(state)){
+  const forward=clamp((keys.forward?1:0)-(keys.back?1:0) + joyY,-1,1);
+  const side=clamp((keys.right?1:0)-(keys.left?1:0) + joyX,-1,1);
   const moving=forward!==0||side!==0;
   const speed=state==="running"?7.5:4.5;
-
   player.root.position.z-=forward*speed*dt;
   player.root.position.x+=side*speed*dt;
-
   player.root.position.x=clamp(player.root.position.x,-110,110);
   player.root.position.z=clamp(player.root.position.z,-250,40);
-
-  if(moving)player.root.rotation.y=Math.atan2(side,-forward);
-
+  if(moving){
+   player.root.rotation.y=Math.atan2(side,-forward);
+   playMove();
+  }
   player.limbs.forEach(l=>{
    l.obj.rotation.x=moving?Math.sin(clock*9)*.55:0;
   });
  }
-
+ // Check sell zone
+ const distToStall=Math.hypot(player.root.position.x-70,player.root.position.z-20);
+ if(distToStall<6 && state!=="flying"){
+  msg("Gần khu bán đồng nát! Bấm nút BÁN nếu muốn.");
+  if(!$("sell").style.display || $("sell").style.display==="none"){
+   // optional auto open or just message
+  }
+ }
  if(state==="holding"){
   kite.visible=true;
-  kite.position.set(
-   player.root.position.x+1,
-   3.8,
-   player.root.position.z-1
-  );
+  kite.position.set(player.root.position.x+1,3.8,player.root.position.z-1);
  }
-
  if(state==="running"){
   flightTime+=dt;
   player.root.position.z-=7*dt;
-  if(flightTime>1.1)finishThrow();
+  if(flightTime>0.7)finishThrow(); // chạy lấy đà ngắn hơn → dễ thả
  }
-
  if(state==="flying"&&playerRetreat<4){
   const amount=Math.min(5*dt,4-playerRetreat);
   player.root.position.z+=amount;
   playerRetreat+=amount;
  }
-
  physics(dt,now);
-
- // CLOUD MOVEMENT
  clouds.forEach(c=>{
   c.position.x+=wind*.012*dt;
   if(c.position.x>250)c.position.x=-250;
  });
-
- // TREE WIND
  trees.forEach((t,i)=>{
-  t.rotation.z=Math.sin(clock*.7+i)*.015;
+  t.rotation.z=Math.sin(clock*.7+i)*.015*(1+wind/40);
  });
-
- // DAY NIGHT
  clockTime+=dt*.008;
  const daylight=(Math.sin(clockTime)+1)/2;
  sun.intensity=.4+daylight*1.1;
  ambient.intensity=.08+daylight*.1;
- sunBall.material.color.setHSL(
-  .12,.7,.7+daylight*.2
- );
-
- // [SỬA] bóng đổ đi theo người chơi (trước đây chỉ phủ vùng quanh gốc tọa độ)
+ sunBall.material.color.setHSL(.12,.7,.7+daylight*.2);
  sun.target.position.set(player.root.position.x,0,player.root.position.z);
- sun.position.set(
-  player.root.position.x-80,130,player.root.position.z+60
- );
-
+ sun.position.set(player.root.position.x-80,130,player.root.position.z+60);
  updateRestock(dt);
  updateString();
  updateCamera(dt);
- // cập nhật HUD ~8 lần/giây thay vì mỗi khung hình (DOM rất tốn)
  uiTimer-=dt;
  if(uiTimer<=0){
   uiTimer=.12;
   updateUI();
  }
-
  if(composer&&quality===2)composer.render();
  else renderer.render(scene,camera);
 }
 
 //==================================================
-// EXPOSE (onclick trong HTML cần hàm global)
+// EXPOSE
 //==================================================
 
-// [SỬA QUAN TRỌNG] toàn bộ code nằm trong IIFE nên các nút onclick="..."
-// không thấy hàm -> báo ReferenceError. Phải gắn vào window.
 Object.assign(window,{
- openShop,closeShop,restock,dailyReward,
+ openShop,closeShop,restock,dailyReward,setShopTab,
  openCustom,closeCustom,paintKite,addDecoration,
- changeCamera,changeWeather,toggleGraphics,mainAction
+ changeCamera,changeWeather,toggleGraphics,mainAction,
+ openBackpack,closeBackpack,openSell,closeSell,trySell,
+ saveGameWithCode,loadGameWithCode,closeCodeModal,confirmCode,
+ toggleSound,showTutorial,closeTutorial
 });
 
 //==================================================
@@ -1357,9 +1938,7 @@ Object.assign(window,{
 
 updateUI();
 renderShop();
-
 $("flight").style.display="none";
-
 requestAnimationFrame(animate);
 
 addEventListener("resize",()=>{
